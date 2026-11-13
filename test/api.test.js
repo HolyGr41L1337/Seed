@@ -6,6 +6,7 @@ import { after, before, describe, it } from 'node:test';
 import { sseData } from '../src/providers/sse.js';
 import { makeApp, openaiProvider, waitFor } from './helpers/app.js';
 import { startMockOpenAI } from './helpers/mock-openai.js';
+import { cmd } from './helpers/shell.js';
 
 let app, mock, base, token, work, cleanup;
 
@@ -272,7 +273,7 @@ describe('conversations', () => {
   });
 
   it('waits for an approval decision made through the API', async () => {
-    next({ toolCalls: [{ name: 'shell', args: { command: 'touch approved.txt' } }] }, { text: 'done' });
+    next({ toolCalls: [{ name: 'shell', args: { command: cmd.touch('approved.txt') } }] }, { text: 'done' });
     const conv = (await post('/api/conversations', { approval: 'ask' })).body;
     const stream = await fetch(`${base}/api/conversations/${conv.id}/messages`, {
       method: 'POST',
@@ -299,7 +300,7 @@ describe('conversations', () => {
   });
 
   it('cancels a run, and cancels it when a streaming client disconnects', async () => {
-    next({ toolCalls: [{ name: 'shell', args: { command: 'sleep 20' } }] });
+    next({ toolCalls: [{ name: 'shell', args: { command: cmd.sleep(20) } }] });
     const conv = (await post('/api/conversations')).body;
     await post(`/api/conversations/${conv.id}/messages`, { content: 'go' });
     await waitFor(async () => (await get(`/api/conversations/${conv.id}`)).body.run?.tools.some((t) => t.status === 'running'));
@@ -307,7 +308,7 @@ describe('conversations', () => {
     await waitFor(async () => (await get(`/api/conversations/${conv.id}`)).body.run === null);
     assert.deepEqual((await post(`/api/conversations/${conv.id}/cancel`)).body, { cancelled: false });
 
-    next({ toolCalls: [{ name: 'shell', args: { command: 'sleep 20' } }] });
+    next({ toolCalls: [{ name: 'shell', args: { command: cmd.sleep(20) } }] });
     const controller = new AbortController();
     const res = await fetch(`${base}/api/chat`, {
       method: 'POST',
@@ -450,7 +451,7 @@ describe('the agent using the app\'s own API', () => {
   });
 
   it('starts other conversations with no more freedom than it has itself', async () => {
-    next({ toolCalls: [{ name: 'shell', args: { command: 'touch sub-agent.txt' } }] }, { text: 'blocked, as expected' });
+    next({ toolCalls: [{ name: 'shell', args: { command: cmd.touch('sub-agent.txt') } }] }, { text: 'blocked, as expected' });
     const conv = await app.createConversation({});
     const res = await agentCall(conv, 'POST', '/api/chat', { message: 'do something', approval: 'full' });
     assert.equal(res.status, 200);

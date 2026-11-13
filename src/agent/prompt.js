@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { APP_DIR, VERSION } from '../util.js';
-import { shellInvocation } from '../tools/shell.js';
+import { IS_WINDOWS, shellName } from '../tools/shell.js';
 
 const MAX_PROJECT_INSTRUCTIONS = 32_000;
 
@@ -37,7 +37,7 @@ function readProjectInstructions(cwd) {
  */
 export function buildSystemPrompt(o) {
   const date = (o.now || new Date()).toISOString().slice(0, 10);
-  const shell = path.basename(shellInvocation('').file);
+  const shell = shellName() + (IS_WINDOWS ? '. Write PowerShell commands, not bash' : '');
   const project = readProjectInstructions(o.cwd);
   const extensions = (o.extensions || []).length
     ? o.extensions.map((e) => `- ${e.name}${e.description ? `: ${e.description}` : ''}`).join('\n')

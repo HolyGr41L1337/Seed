@@ -5,6 +5,7 @@ import path from 'node:path';
 import { afterEach, describe, it } from 'node:test';
 import { chat, lastAssistantText, makeApp, notices, openaiProvider, toolResults, waitFor } from './helpers/app.js';
 import { startMockOpenAI } from './helpers/mock-openai.js';
+import { cmd } from './helpers/shell.js';
 
 let cleanups = [];
 afterEach(async () => {
@@ -28,7 +29,7 @@ describe('agent loop', () => {
   it('runs tools until the model answers, and replays reasoning', async () => {
     const { app, mock, work } = await setup([
       { reasoning: 'Write first.', text: 'Creating it.', toolCalls: [{ name: 'write_file', args: { path: 'hello.txt', content: 'hi\n' } }] },
-      { toolCalls: [{ name: 'read_file', args: { path: 'hello.txt' } }, { name: 'shell', args: { command: 'cat hello.txt' } }] },
+      { toolCalls: [{ name: 'read_file', args: { path: 'hello.txt' } }, { name: 'shell', args: { command: cmd.cat('hello.txt') } }] },
       { text: 'Done.' },
     ]);
     const { conv, result, events } = await chat(app, 'create hello.txt');
@@ -128,7 +129,7 @@ describe('approvals', () => {
     const { app, work } = await setup(
       [
         { toolCalls: [{ name: 'write_file', args: { path: 'a.txt', content: '1' } }] },
-        { toolCalls: [{ name: 'write_file', args: { path: 'b.txt', content: '2' } }, { name: 'shell', args: { command: 'touch c.txt' } }] },
+        { toolCalls: [{ name: 'write_file', args: { path: 'b.txt', content: '2' } }, { name: 'shell', args: { command: cmd.touch('c.txt') } }] },
         { text: 'done' },
       ],
       { approval: 'ask' },
@@ -146,13 +147,13 @@ describe('approvals', () => {
     for (const f of ['a.txt', 'b.txt', 'c.txt']) await fsp.access(path.join(work, f));
     const requests = events.filter((e) => e.type === 'approval.requested').map((e) => e.approval);
     assert.deepEqual(requests.map((a) => a.category), ['write', 'exec']);
-    assert.equal(requests[1].detail, 'touch c.txt');
+    assert.equal(requests[1].detail, cmd.touch('c.txt'));
     assert.equal(requests[0].preview.type, 'write');
   });
 
   it('stops and waits for the user after a declined action', async () => {
     const { app, mock, work } = await setup(
-      [{ toolCalls: [{ name: 'shell', args: { command: 'touch no.txt' } }, { name: 'write_file', args: { path: 'never.txt', content: 'x' } }] }, { text: 'unreachable' }],
+      [{ toolCalls: [{ name: 'shell', args: { command: cmd.touch('no.txt') } }, { name: 'write_file', args: { path: 'never.txt', content: 'x' } }] }, { text: 'unreachable' }],
       { approval: 'ask' },
     );
     const conv = await app.createConversation({});
@@ -169,7 +170,7 @@ describe('approvals', () => {
   });
 
   it('refuses instead of asking when nobody can answer', async () => {
-    const { app, work } = await setup([{ toolCalls: [{ name: 'shell', args: { command: 'touch no.txt' } }, { name: 'list_dir', args: {} }] }, { text: 'I could only look.' }], { approval: 'ask' });
+    const { app, work } = await setup([{ toolCalls: [{ name: 'shell', args: { command: cmd.touch('no.txt') } }, { name: 'list_dir', args: {} }] }, { text: 'I could only look.' }], { approval: 'ask' });
     const { conv, result } = await chat(app, 'go', { interactive: false });
     assert.equal(result.status, 'completed');
     assert.match(toolResults(conv)[0].content, /needs the user's approval and this run cannot ask/);
@@ -212,7 +213,7 @@ describe('approvals', () => {
 
 describe('cancelling and failures', () => {
   it('stops a running command and records the cancellation', async () => {
-    const { app } = await setup([{ toolCalls: [{ name: 'shell', args: { command: 'sleep 20' } }, { name: 'list_dir', args: {} }] }, { text: 'unreachable' }]);
+    const { app } = await setup([{ toolCalls: [{ name: 'shell', args: { command: cmd.sleep(20) } }, { name: 'list_dir', args: {} }] }, { text: 'unreachable' }]);
     const conv = await app.createConversation({});
     const events = [];
     const run = await app.runs.start(conv, { content: [{ type: 'text', text: 'go' }], onEvent: (e) => events.push(e) });

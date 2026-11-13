@@ -12,6 +12,7 @@ import { globToRegExp, globTool, grepTool } from '../src/tools/search.js';
 import { isReadOnlyCommand, shellTool } from '../src/tools/shell.js';
 import { htmlToText } from '../src/tools/web.js';
 import { deepMerge, isInside, truncateMiddle } from '../src/util.js';
+import { IS_WINDOWS, cmd } from './helpers/shell.js';
 
 let dir;
 let ctx;
@@ -125,7 +126,7 @@ describe('search tools', () => {
 
 describe('shell', () => {
   it('returns output and the exit code', async () => {
-    const ok = await shellTool.run({ command: 'echo hi && echo err >&2' }, ctx);
+    const ok = await shellTool.run({ command: cmd.stdoutThenStderr }, ctx);
     assert.equal(ok.content, 'hi\nerr');
     const failed = await shellTool.run({ command: 'echo before; exit 3' }, ctx);
     assert.match(failed.content, /before\n\[exit code: 3\]/);
@@ -134,19 +135,26 @@ describe('shell', () => {
 
   it('runs in the workspace and streams output', async () => {
     const chunks = [];
-    const res = await shellTool.run({ command: 'pwd' }, { ...ctx, emit: (t) => chunks.push(t) });
+    const res = await shellTool.run({ command: cmd.pwd }, { ...ctx, emit: (t) => chunks.push(t) });
     assert.equal(res.content, dir);
     assert.equal(chunks.join('').trim(), dir);
   });
 
   it('times out and can be cancelled', async () => {
-    const slow = await shellTool.run({ command: 'sleep 5', timeout_ms: 1000 }, ctx);
+    const slow = await shellTool.run({ command: cmd.sleep(5), timeout_ms: 1000 }, ctx);
     assert.match(slow.content, /timed out after 1s/);
     assert.equal(slow.is_error, true);
     const controller = new AbortController();
     setTimeout(() => controller.abort(), 150);
-    const cancelled = await shellTool.run({ command: 'sleep 5' }, { ...ctx, signal: controller.signal });
+    const cancelled = await shellTool.run({ command: cmd.sleep(5) }, { ...ctx, signal: controller.signal });
     assert.match(cancelled.content, /cancelled by the user/);
+  });
+
+  it('keeps non-English text and handles very long commands', async () => {
+    assert.equal((await shellTool.run({ command: 'echo 你好，世界' }, ctx)).content, '你好，世界');
+    const long = 'x'.repeat(15000); // too long for one Windows command line once encoded
+    const res = await shellTool.run({ command: `echo ${long}` }, ctx);
+    assert.equal(res.content, long);
   });
 
   it('classifies read-only commands narrowly', () => {
@@ -185,14 +193,14 @@ describe('approval policy', () => {
   it('judges a path by where it really is, not by a symlink\'s name', async () => {
     const outside = await fsp.realpath(await fsp.mkdtemp(path.join(os.homedir(), '.seed-test-outside-')));
     try {
-      await fsp.symlink(outside, path.join(dir, 'link-out'));
+      await fsp.symlink(outside, path.join(dir, 'link-out'), IS_WINDOWS ? 'junction' : 'dir');
       const here = { cwd: dir, extensionsDir: path.join(outside, 'no-extensions'), appDir: path.join(outside, 'no-app') };
       assert.equal(categoryOf({ kind: 'write', paths: [path.join(dir, 'plain.txt')] }, here), 'write');
       assert.equal(categoryOf({ kind: 'write', paths: [path.join(dir, 'link-out', 'x.txt')] }, here), 'write_outside');
       assert.equal(categoryOf({ kind: 'write', paths: [path.join(dir, 'link-out', 'new', 'deep', 'x.txt')] }, here), 'write_outside');
       assert.equal(categoryOf({ kind: 'read', paths: [path.join(dir, 'link-out', 'x.txt')] }, here), 'read');
       // The protected config file stays protected when reached through a link.
-      await fsp.symlink(path.join(dir, 'secret'), path.join(dir, 'link-secret'));
+      await fsp.symlink(path.join(dir, 'secret'), path.join(dir, 'link-secret'), IS_WINDOWS ? 'junction' : 'dir');
       const viaLink = await readFileTool.run({ path: 'link-secret/config.json' }, ctx);
       assert.equal(viaLink.is_error, true);
       assert.doesNotMatch(viaLink.content, /sk-secret/);

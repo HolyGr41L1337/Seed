@@ -16,11 +16,11 @@ describe('configuration', () => {
     const home = await tempHome();
     const config = new Config(home, { detectEnv: false });
     assert.match(config.server.token, /^[\w-]{20,}$/);
-    assert.equal(fs.statSync(config.file).mode & 0o777, 0o600);
+    if (process.platform !== 'win32') assert.equal(fs.statSync(config.file).mode & 0o777, 0o600);
     const again = new Config(home, { detectEnv: false });
     assert.equal(again.server.token, config.server.token, 'the token survives restarts');
     await config.update({ approval: 'auto-edit' });
-    assert.equal(fs.statSync(config.file).mode & 0o777, 0o600);
+    if (process.platform !== 'win32') assert.equal(fs.statSync(config.file).mode & 0o777, 0o600);
     await fsp.rm(home, { recursive: true, force: true });
   });
 

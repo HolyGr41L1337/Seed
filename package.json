@@ -1,18 +1,29 @@
 {
   "name": "seed-harness",
   "version": "0.1.0",
+  "productName": "Seed",
+  "desktopName": "seed.desktop",
   "description": "Seed — a self-growing AI agent harness. It starts as a single input bar; everything else is built by the AI.",
+  "author": "Seed",
+  "license": "UNLICENSED",
   "type": "module",
+  "main": "desktop/main.js",
   "bin": {
     "seed": "bin/seed.js"
   },
-  "main": "src/index.js",
   "exports": {
     ".": "./src/index.js"
   },
   "scripts": {
     "start": "node bin/seed.js",
-    "test": "node --test test/*.test.js"
+    "desktop": "electron .",
+    "test": "node --test test/*.test.js",
+    "test:ui": "node test/e2e/ui.mjs",
+    "test:desktop": "node test/e2e/desktop.mjs",
+    "dist": "electron-builder --config electron-builder.config.cjs",
+    "dist:mac": "electron-builder --config electron-builder.config.cjs --mac",
+    "dist:win": "electron-builder --config electron-builder.config.cjs --win",
+    "dist:linux": "electron-builder --config electron-builder.config.cjs --linux"
   },
   "engines": {
     "node": ">=20.6"
@@ -20,7 +31,10 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0"
   },
-  "private": true,
+  "devDependencies": {
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0"
+  },
   "files": [
     "bin",
     "src",
@@ -28,5 +42,6 @@
     "docs",
     "examples",
     "README.md"
-  ]
+  ],
+  "private": true
 }

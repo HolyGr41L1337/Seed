@@ -577,7 +577,7 @@ function checkModuleSyntax(file, shownName) {
     } catch (err) {
       return resolve(`Cannot read ${shownName}: ${err.message}`);
     }
-    const child = spawn(process.execPath, ['--input-type=module', '--check'], { stdio: ['pipe', 'ignore', 'pipe'], env: { ...process.env, NODE_OPTIONS: '' } });
+    const child = spawn(process.execPath, ['--input-type=module', '--check'], { stdio: ['pipe', 'ignore', 'pipe'], env: { ...process.env, NODE_OPTIONS: '', ...(process.versions.electron ? { ELECTRON_RUN_AS_NODE: '1' } : {}) } });
     let stderr = '';
     const timer = setTimeout(() => child.kill(), 8000);
     child.stderr.on('data', (chunk) => (stderr += chunk));

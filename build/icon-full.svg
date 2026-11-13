@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c6b3c"/>
+      <stop offset="1" stop-color="#0d3f22"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#86efac"/>
+      <stop offset="1" stop-color="#4ade80"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <!-- macOS icon grid: 824px body inside a 1024px canvas -->
+  <rect x="0" y="0" width="1024" height="1024" rx="200" fill="url(#bg)"/>
+  <g transform="translate(465 500) scale(1.18)">
+    <path d="M0 250V40" fill="none" stroke="#dcfce7" stroke-width="46" stroke-linecap="round"/>
+    <path d="M0 70C0 -110 105 -215 285 -215c0 180 -105 285 -285 285Z" fill="url(#leaf)"/>
+    <path d="M0 150c0 -125 -78 -205 -205 -205c0 127 80 205 205 205Z" fill="#bbf7d0"/>
+  </g>
+</svg>

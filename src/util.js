@@ -48,7 +48,17 @@ export async function writeFileAtomic(file, data, options = {}) {
   const tmp = `${file}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
   try {
     await fsp.writeFile(tmp, data, options);
-    await fsp.rename(tmp, file);
+    // On Windows a file that another program has open (a virus scanner, an editor)
+    // cannot be replaced for a moment. Try again briefly before giving up.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await fsp.rename(tmp, file);
+        break;
+      } catch (err) {
+        if (process.platform !== 'win32' || attempt >= 8 || !['EPERM', 'EACCES', 'EBUSY'].includes(err.code)) throw err;
+        await new Promise((resolve) => setTimeout(resolve, 25 * (attempt + 1)));
+      }
+    }
   } catch (err) {
     await fsp.rm(tmp, { force: true }).catch(() => {});
     throw err;

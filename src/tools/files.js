@@ -19,7 +19,8 @@ export function resolveToolPath(ctx, p) {
 
 /** Short path for messages: relative when inside the workspace. */
 export function displayPath(ctx, abs) {
-  return isInside(ctx.cwd, abs) ? path.relative(ctx.cwd, abs) || '.' : abs;
+  // Relative paths use "/" on every platform (Windows accepts it too).
+  return isInside(ctx.cwd, abs) ? path.relative(ctx.cwd, abs).split(path.sep).join('/') || '.' : abs;
 }
 
 /** Files the tools never touch, whatever the approval mode: they hold the user's API keys. */

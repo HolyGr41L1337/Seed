@@ -218,6 +218,8 @@ function handleEvent(e) {
   if (e.type === 'config.changed') {
     setState({ config: e.config });
     renderChrome();
+    // The default workspace can change with the settings (the desktop app's "Open Folder").
+    api.get('/api/info').then((info) => (setState({ info }), renderChrome())).catch(() => {});
   } else if (e.type === 'extensions.changed') {
     loadExtensions();
   } else if (e.type === 'conversation.deleted' && e.conversationId === state.conversationId) {

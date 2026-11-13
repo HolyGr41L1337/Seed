@@ -2,6 +2,7 @@
 // the provider adapters, the tool registry, the agent runs, the extension
 // host and the HTTP server, and wires them together.
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { Config } from './config.js';
 import { EventHub, Hooks } from './events.js';
@@ -25,7 +26,8 @@ export class App {
    */
   constructor(options = {}) {
     this.home = resolveHome(options.home);
-    this.cwd = path.resolve(options.cwd || process.cwd());
+    // A workspace given at start-up (the command line) wins over the saved default.
+    this.fixedCwd = options.cwd ? path.resolve(options.cwd) : null;
     this.safeMode = !!options.safeMode;
     this.watchExtensions = options.watch !== false;
     this.extensionsDir = path.join(this.home, 'extensions');
@@ -83,6 +85,20 @@ export class App {
       }
     })();
     return this.choosingModel;
+  }
+
+  /** Workspace for new conversations: the start-up folder, else the saved default, else the home folder. */
+  get cwd() {
+    if (this.fixedCwd) return this.fixedCwd;
+    const saved = this.config.data.workspace;
+    if (saved) {
+      try {
+        if (fs.statSync(saved).isDirectory()) return saved;
+      } catch {
+        /* moved or deleted: fall back */
+      }
+    }
+    return os.homedir();
   }
 
   resolveDirectory(dir) {

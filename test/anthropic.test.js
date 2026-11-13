@@ -166,7 +166,7 @@ describe('conversation replay', () => {
         model: 'claude-opus-5',
         blocks: [
           { type: 'text', text: 'Starting. ' },
-          { type: 'tool_use', id: 'declined', name: 'shell', input: { command: 'touch never.txt' } },
+          { type: 'tool_use', id: 'declined', name: 'shell', input: { command: 'rm -rf never-run' } },
           { type: 'fallback', from: { model: 'claude-opus-5-5' }, to: { model: 'claude-opus-5' } },
           { type: 'text', text: 'Continuing.' },
           { type: 'tool_use', id: 'kept', name: 'list_dir', input: {} },

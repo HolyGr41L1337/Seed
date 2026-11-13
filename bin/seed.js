@@ -122,7 +122,7 @@ function openBrowser(url) {
 async function serve(values) {
   const { App } = await import('../src/app.js');
   const { VERSION, homeRelative } = await import('../src/util.js');
-  const app = new App({ home: values.home, cwd: values.cwd, safeMode: values.safe, overrides: overridesFrom(values) });
+  const app = new App({ home: values.home, cwd: values.cwd || process.cwd(), safeMode: values.safe, overrides: overridesFrom(values) });
   await app.init();
   let address;
   try {
@@ -177,7 +177,7 @@ async function exec(values, prompt) {
     process.exit(2);
   }
   const { App } = await import('../src/app.js');
-  const app = new App({ home: values.home, cwd: values.cwd, safeMode: values.safe, watch: false, overrides: overridesFrom(values) });
+  const app = new App({ home: values.home, cwd: values.cwd || process.cwd(), safeMode: values.safe, watch: false, overrides: overridesFrom(values) });
   await app.init();
 
   const tty = process.stdout.isTTY;

@@ -169,6 +169,7 @@ export const grepTool = {
 function grepWithRipgrep(args, ctx, target, max, context) {
   return new Promise((resolve) => {
     const rgArgs = ['--line-number', '--no-heading', '--with-filename', '--color', 'never', '--max-columns', '300', '--max-columns-preview'];
+    if (process.platform === 'win32') rgArgs.push('--path-separator', '/');
     if (args.ignore_case) rgArgs.push('-i');
     if (context) rgArgs.push('-C', String(context));
     if (args.glob) rgArgs.push('-g', args.glob);
@@ -207,7 +208,8 @@ function grepWithRipgrep(args, ctx, target, max, context) {
 }
 
 function relativize(line, ctx) {
-  const prefix = ctx.cwd.endsWith(path.sep) ? ctx.cwd : ctx.cwd + path.sep;
+  const cwd = process.platform === 'win32' ? ctx.cwd.split(path.sep).join('/') : ctx.cwd; // matches --path-separator /
+  const prefix = cwd.endsWith('/') ? cwd : `${cwd}/`;
   return line.startsWith(prefix) ? line.slice(prefix.length) : line;
 }
 

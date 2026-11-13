@@ -15,6 +15,7 @@ const DEFAULTS = {
   providers: {},
   model: null, // "<providerId>/<modelId>"
   approval: 'ask',
+  workspace: null, // default workspace folder when the app is not started in one (the desktop app)
   server: { host: '127.0.0.1', port: 7333, token: null },
   agent: {
     maxSteps: 200, // tool rounds per run before the agent pauses
@@ -113,6 +114,7 @@ export class Config extends EventEmitter {
       providers,
       model: this.data.model,
       approval: this.approval,
+      workspace: this.data.workspace,
       agent: this.data.agent,
       extensions: this.data.extensions,
       server: { host: this.server.host, port: this.server.port },
@@ -186,6 +188,16 @@ function validate(data) {
     }
   }
   if (data.model != null && typeof data.model !== 'string') throw new ConfigError('model must be a string.');
+  if (data.workspace != null) {
+    if (typeof data.workspace !== 'string' || !path.isAbsolute(data.workspace)) throw new ConfigError('workspace must be an absolute path.');
+    let isDir = false;
+    try {
+      isDir = fs.statSync(data.workspace).isDirectory();
+    } catch {
+      /* reported below */
+    }
+    if (!isDir) throw new ConfigError(`workspace is not a directory: ${data.workspace}`);
+  }
   const port = data.server?.port;
   if (!Number.isInteger(port) || port < 0 || port > 65535) throw new ConfigError('server.port must be an integer 0–65535.');
   if (!Number.isInteger(data.agent?.maxSteps) || data.agent.maxSteps < 1) {
