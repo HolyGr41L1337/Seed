@@ -29,8 +29,8 @@ let hooksInstalled = false;
  * The entry file is imported with "?g=<generation>"; this hook passes the
  * same query on to the files it imports from inside the extensions folder.
  */
-function installFreshImportHook(root) {
-  freshRoots.add(`${pathToFileURL(root).href}/`);
+function installFreshImportHook(roots) {
+  for (const root of roots) freshRoots.add(`${pathToFileURL(root).href}/`);
   if (hooksInstalled || typeof nodeModule.registerHooks !== 'function') return;
   hooksInstalled = true;
   nodeModule.registerHooks({
@@ -71,7 +71,10 @@ export class ExtensionHost {
 
   async init() {
     await fsp.mkdir(this.dir, { recursive: true });
-    installFreshImportHook(this.dir);
+    // Node loads modules from their real location, so a folder reached through a
+    // symlink (macOS: /var is /private/var) is known under both names.
+    this.dirs = [...new Set([this.dir, fs.realpathSync(this.dir)])];
+    installFreshImportHook(this.dirs);
     await this.reload();
   }
 
@@ -194,7 +197,7 @@ export class ExtensionHost {
       record.server = { status: 'ok', error: null };
     } catch (err) {
       await this.dispose(record);
-      let error = formatError(err, this.dir);
+      let error = formatError(err, this.dirs || [this.dir]);
       // An import that fails to parse does not say where. Find the file and line.
       if (err instanceof SyntaxError) error = (await locateSyntaxError(record.dir, record.name)) || error;
       record.server = { status: 'error', error };
@@ -430,7 +433,7 @@ export class ExtensionHost {
 
   runtimeError(name, err, side) {
     const record = this.records.get(name);
-    const text = `[${side}] ${formatError(err, this.dir)}`.slice(0, 2000);
+    const text = `[${side}] ${formatError(err, this.dirs || [this.dir])}`.slice(0, 2000);
     if (!record) return console.error(`[seed] extension "${name}":`, text);
     if (record.runtimeErrors.at(-1) !== text) record.runtimeErrors.push(text);
     if (record.runtimeErrors.length > 5) record.runtimeErrors.shift();
@@ -632,20 +635,19 @@ function indent(text) {
 }
 
 /** Error text for the agent: message plus the stack frames inside the extensions folder. */
-export function formatError(err, extensionsDir) {
+export function formatError(err, extensionsDirs) {
   if (!err || typeof err !== 'object') return String(err);
+  const dirs = Array.isArray(extensionsDirs) ? extensionsDirs : [extensionsDirs];
+  // Longest first, so "/private/var/x" is removed before "/var/x" can match inside it.
+  const prefixes = [...dirs.map((d) => `${pathToFileURL(d).href}/`), ...dirs.map((d) => d + path.sep)].sort((a, b) => b.length - a.length);
   const stack = String(err.stack || err.message || err);
-  const prefix = pathToFileURL(extensionsDir).href;
-  const lines = stack.split('\n');
   const kept = [];
-  for (const line of lines) {
+  for (const line of stack.split('\n')) {
     const isFrame = /^\s+at /.test(line);
-    if (!isFrame || line.includes(prefix) || line.includes(extensionsDir)) kept.push(line);
+    if (!isFrame || prefixes.some((p) => line.includes(p))) kept.push(line);
     if (kept.length >= 14) break;
   }
-  return kept
-    .join('\n')
-    .replaceAll(prefix + '/', '')
-    .replaceAll(extensionsDir + path.sep, '')
-    .replace(/\?g=\d+/g, '');
+  let text = kept.join('\n');
+  for (const p of prefixes) text = text.replaceAll(p, '');
+  return text.replace(/\?g=\d+/g, '');
 }

@@ -142,8 +142,8 @@ export class App {
     const onError = (err) => {
       const text = String(err?.stack || err);
       // Stack frames name the file either as a path or as a file:// URL.
-      const at = text.indexOf(this.extensionsDir + path.sep);
-      const name = at >= 0 ? text.slice(at + this.extensionsDir.length + 1).split(/[\\/]/)[0] : /\/extensions\/([^/\s?]+)\//.exec(text)?.[1];
+      const dir = (this.extensions.dirs || [this.extensionsDir]).find((d) => text.includes(d + path.sep));
+      const name = dir ? text.slice(text.indexOf(dir + path.sep) + dir.length + 1).split(/[\\/]/)[0] : /\/extensions\/([^/\s?]+)\//.exec(text)?.[1];
       if (name && this.extensions.records.has(name)) this.extensions.runtimeError(name, err, 'server');
       console.error('[seed] unexpected error:', err);
     };

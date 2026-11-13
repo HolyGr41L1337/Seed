@@ -1,9 +1,11 @@
 // The extension system: loading, reloading, error reporting, isolation.
 import assert from 'node:assert/strict';
 import fsp from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, it } from 'node:test';
 import { sseData } from '../src/providers/sse.js';
+import { App } from '../src/app.js';
 import { APP_DIR } from '../src/util.js';
 import { chat, makeApp, openaiProvider, toolResults, waitFor } from './helpers/app.js';
 import { startMockOpenAI } from './helpers/mock-openai.js';
@@ -179,6 +181,33 @@ describe('server side', () => {
     assert.equal(ext('full'), undefined);
     await assert.rejects(fsp.access(path.join(app.extensionsDir, 'full')));
     assert.equal((await app.api.dispatch({ method: 'PATCH', url: '/api/extensions/nope', body: { enabled: true } })).status, 404);
+  });
+
+  it('works when the data folder is reached through a symlink (macOS: /var is /private/var)', async () => {
+    const real = await fsp.mkdtemp(path.join(os.tmpdir(), 'seed-real-home-'));
+    const link = `${real}-link`;
+    await fsp.symlink(real, link, process.platform === 'win32' ? 'junction' : 'dir');
+    const app = new App({ home: link, cwd: os.tmpdir(), detectEnv: false, watch: false });
+    cleanups.push(async () => {
+      await app.close();
+      await fsp.rm(link, { force: true });
+      await fsp.rm(real, { recursive: true, force: true });
+    });
+    await app.init();
+    const write = async (rel, content) => {
+      const file = path.join(app.extensionsDir, rel);
+      await fsp.mkdir(path.dirname(file), { recursive: true });
+      await fsp.writeFile(file, content);
+    };
+    await write('counter/helper.js', 'export const VALUE = "one";\n');
+    await write('counter/server.js', `import { VALUE } from './helper.js';\nexport function activate(ctx) { ctx.tools.register({ name: 'linked_value', description: 'v', kind: 'read', run: () => VALUE }); }`);
+    await write('throws/server.js', 'export function activate(ctx) {\n  null.boom();\n}\n');
+    await app.extensions.reload();
+    await write('counter/helper.js', 'export const VALUE = "two";\n');
+    await app.extensions.reload();
+    assert.equal(await app.tools.get('linked_value').run({}, {}), 'two');
+    const error = app.extensions.list().find((e) => e.name === 'throws').server.error;
+    assert.match(error, /at activate \(throws\/server\.js:2:8\)$/);
   });
 
   it('loads nothing in safe mode', async () => {
