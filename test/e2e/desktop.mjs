@@ -86,6 +86,11 @@ try {
 
   // A conversation: the model API is reached through the app's network layer,
   // a command runs in the platform's shell, a file is written in the workspace.
+  // Record the key events the page receives, for the report if this step fails.
+  await page.evaluate(() => {
+    window.__keys = [];
+    document.addEventListener('keydown', (e) => window.__keys.push({ key: e.key, keyCode: e.keyCode, isComposing: e.isComposing, target: e.target?.id }), true);
+  });
   await page.fill('#input', '在桌面应用里跑一下');
   await page.locator('#input').press('Enter');
   await page.waitForSelector('.msg.user', { timeout: 30_000 });
@@ -130,8 +135,13 @@ try {
       input: document.querySelector('#input')?.value,
       toasts: document.querySelector('#toasts')?.innerText,
       thread: document.querySelector('#thread')?.innerText.slice(0, 1500),
+      keys: window.__keys,
+      focus: document.hasFocus(),
+      active: document.activeElement?.id,
+      visibility: document.visibilityState,
+      send: { disabled: document.querySelector('#send')?.disabled, stop: document.querySelector('#send')?.classList.contains('stop') },
     }));
-    console.error('page:', state);
+    console.error('page:', JSON.stringify(state, null, 2));
     const shots = path.join(ROOT, 'test-results');
     await fsp.mkdir(shots, { recursive: true });
     await page.screenshot({ path: path.join(shots, `desktop-failure-${process.platform}.png`) });
