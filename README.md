@@ -17,13 +17,65 @@ Seed 是一个类似 Codex、DeepSeek Harness 的智能体运行框架（harness
 - **接你自己的 API**：DeepSeek、OpenAI、OpenRouter、Ollama 以及任何 OpenAI 兼容接口；Claude 走 Anthropic 官方 SDK。可以配多家，随时切换，同一个对话中途换模型也行。
 - **别的程序也能接它**：全部功能都有 HTTP API。另有一个 OpenAI 兼容端点，把任何支持 OpenAI 接口的客户端指向 Seed，就能把整个智能体当成一个"模型"来用。
 
-## 快速开始
+## 下载安装
 
-需要 Node.js 20.6 或更高版本（推荐 22.21 以上，代理支持更完整）。
+到仓库的 [Releases](https://github.com/HolyGr41L1337/Seed/releases/latest) 页面下载对应的文件：
+
+| 系统 | 下载 | 用法 |
+| --- | --- | --- |
+| macOS（Apple 芯片：M1/M2/M3/M4…） | `Seed-<版本>-mac-arm64.dmg` | 打开后把 Seed 拖进"应用程序" |
+| macOS（Intel 芯片） | `Seed-<版本>-mac-x64.dmg` | 同上 |
+| Windows（绝大多数电脑） | `Seed-Setup-<版本>-x64.exe` | 双击安装，装完自动打开，不需要管理员权限 |
+| Windows（免安装） | `Seed-<版本>-win-x64.zip` | 解压后双击 `Seed.exe` |
+| Windows（ARM 电脑） | `Seed-Setup-<版本>-arm64.exe` | 同上 |
+| Linux | `Seed-<版本>-linux-x86_64.AppImage` | 加上执行权限后双击 |
+
+不知道 Mac 是哪种芯片：点左上角苹果菜单 →"关于本机"，"芯片"一栏写着 Apple M… 的选 arm64，写着 Intel 的选 x64。
+
+打开后是一个只有输入栏的窗口，下方有"连接模型 API"的卡片：选服务商，填 API Key，点连接，就可以开始用了。
+
+### 第一次打开时的系统提示
+
+目前的安装包没有经过苹果和微软的付费签名，所以第一次打开时系统会拦一下。这是所有未签名软件都会遇到的情况，按下面操作一次即可，以后正常打开。
+
+- **macOS**：双击后如果提示"无法验证开发者"或"Apple 无法检查其是否包含恶意软件"，先点"完成"关掉提示，然后打开"系统设置 → 隐私与安全性"，在页面下方找到关于 Seed 的提示，点"仍要打开"。也可以在"终端"里运行一次：
+
+  ```bash
+  xattr -dr com.apple.quarantine /Applications/Seed.app
+  ```
+
+- **Windows**：如果出现"Windows 已保护你的电脑"，点"更多信息"，再点"仍要运行"。
+
+想让用户完全看不到这些提示，需要购买签名证书，见下文"发布新版本"。
+
+### 桌面版的几个菜单
+
+- **文件 → 选择工作目录…**（`Cmd/Ctrl+O`）：AI 读写文件、运行命令所在的文件夹。默认是你的用户主目录，建议选到具体项目。
+- **文件 → 复制 API 接入信息**：复制本机 API 地址和访问令牌，给别的程序接入用（见"通过 API 接入"）。
+- **视图 → 安全模式**：某个扩展把界面弄坏时，用它打开一个不加载界面扩展的窗口。
+
+桌面版会自动使用系统的代理设置（例如代理工具开启的系统代理），访问 OpenAI、Anthropic 等服务时不需要额外配置。macOS 上关闭窗口后应用仍在后台运行（API 也继续可用），从程序坞点它会重新打开窗口；完全退出用 `Cmd+Q`。
+
+桌面版和命令行版共用同一份数据（`~/.seed`），对话、设置和扩展是通用的。
+
+## 从源码运行（开发者）
+
+需要 Node.js 22 或更高版本。
 
 ```bash
 cd seed
 npm install
+```
+
+以桌面应用方式运行：
+
+```bash
+npm run desktop
+```
+
+以本地网页服务方式运行（在浏览器里用）：
+
+```bash
 npm start
 ```
 
@@ -33,9 +85,7 @@ npm start
   Open        http://127.0.0.1:7333/?token=…
 ```
 
-第一次打开时，输入栏下方有一张"连接模型 API"的卡片：选服务商，填 API Key，点连接。之后界面就只剩输入栏了。
-
-想装成全局命令：
+只用命令行版、不需要桌面版时，可以用 `npm install --omit=dev` 跳过 Electron 的下载。想装成全局命令：
 
 ```bash
 npm link
@@ -171,6 +221,38 @@ seed url                    # 打印带令牌的地址
 seed --safe                 # 不加载扩展启动
 ```
 
+## 发布新版本
+
+安装包由 GitHub Actions 在真实的 macOS、Windows、Linux 机器上构建。推送一个以 `v` 开头的标签就会发布新版本：
+
+```bash
+git tag v0.2.0
+```
+
+```bash
+git push origin v0.2.0
+```
+
+大约 15 分钟后，[Releases](https://github.com/HolyGr41L1337/Seed/releases) 页面会出现 `v0.2.0`，附带上面表格里的所有文件。每个安装包在发布前都会被实际启动一遍，跑一次完整的对话流程来检查。也可以在 Actions 页面手动运行 Release 工作流，只构建、不发布。
+
+在自己电脑上打包：
+
+```bash
+npm run dist:mac
+```
+
+（Windows 上用 `npm run dist:win`，Linux 上用 `npm run dist:linux`，产物在 `dist/` 里。）
+
+**谁能下载。** 仓库是私有的，Releases 里的文件也只有对仓库有权限的人能下载。要让任何人都能下载，可以把仓库改为公开，或者另建一个公开仓库专门放安装包。
+
+**去掉"未验证开发者"提示。** 在仓库的 Settings → Secrets and variables → Actions 里加上这些密钥，之后发布的安装包会自动签名：
+
+| 密钥 | 内容 | 用途 |
+| --- | --- | --- |
+| `MAC_CERT_P12_BASE64` / `MAC_CERT_PASSWORD` | Apple "Developer ID Application" 证书（.p12，base64 编码）及其密码 | macOS 签名（需要 Apple 开发者账号，每年 99 美元） |
+| `APPLE_ID` / `APPLE_APP_SPECIFIC_PASSWORD` / `APPLE_TEAM_ID` | Apple ID、App 专用密码、团队 ID | macOS 公证，之后双击即可打开 |
+| `WIN_CERT_PFX_BASE64` / `WIN_CERT_PASSWORD` | Windows 代码签名证书（.pfx，base64 编码）及其密码 | Windows 签名 |
+
 ## 安全须知
 
 - 服务默认只监听本机（`127.0.0.1`）。所有接口都需要访问令牌；浏览器端的登录状态只对 Seed 自己的页面有效，其他网页无法借用。页面被嵌在 IDE 或云端的预览面板里、Cookie 用不了时，会自动改用令牌登录。
@@ -183,6 +265,10 @@ seed --safe                 # 不加载扩展启动
 
 ```
 bin/seed.js            命令行入口
+desktop/main.js        桌面应用（Electron）：窗口、菜单、系统代理
+build/                 应用图标、macOS 签名配置
+electron-builder.config.cjs   打包配置
+.github/workflows/     三平台测试（ci.yml）、构建并发布安装包（release.yml）
 src/
   app.js               把各部分组装起来
   agent/               智能体循环、审批策略、系统提示词、上下文整理
@@ -196,13 +282,14 @@ examples/extensions/   示例扩展
 test/                  自动化测试
 ```
 
-唯一的运行时依赖是 `@anthropic-ai/sdk`。没有构建步骤，改了代码重启即可。设计思路见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
+唯一的运行时依赖是 `@anthropic-ai/sdk`（桌面版另外用到 Electron）。没有构建步骤，改了代码重启即可。设计思路见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
 ## 测试
 
 ```bash
 npm test                 # 工具、审批策略、智能体循环、两种模型接口、HTTP API、扩展系统
 node test/e2e/ui.mjs     # 浏览器端到端测试（需要另装 Playwright）
+node test/e2e/desktop.mjs   # 桌面应用冒烟测试（需要 Playwright；加 --app <路径> 测试打包好的应用）
 ```
 
 测试用脚本化的假模型服务（按 OpenAI 和 Anthropic 的线上协议应答）驱动真实的智能体循环和真实的界面。
@@ -212,4 +299,4 @@ node test/e2e/ui.mjs     # 浏览器端到端测试（需要另装 Playwright）
 - 模型接口是按公开协议实现、用假服务验证的，开发环境里没有真实的 API Key，**尚未对真实的 DeepSeek / OpenAI / Anthropic 接口做过联调**。首次接入如果遇到某家接口的特殊要求，通常在该服务商的 `params` 里调整即可。
 - 没有系统级沙箱（见上）。
 - 还没有内置 MCP、网页搜索、图片上传界面（API 已支持图片内容块）。这些都可以让 AI 以扩展的形式加上。
-- 主要在 Linux 上开发和测试；macOS 应当可用，Windows 尚未验证。
+- 自动化测试和桌面应用冒烟测试在 Linux、macOS、Windows 上运行（GitHub Actions），但还没有在真人使用的 Mac 和 Windows 电脑上长期使用过。

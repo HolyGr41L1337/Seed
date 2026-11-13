@@ -56,6 +56,8 @@ const app = await electron.launch({
   timeout: 60_000,
 });
 const problems = [];
+const mainOutput = [];
+for (const stream of [app.process().stdout, app.process().stderr]) stream?.on('data', (d) => mainOutput.push(String(d)));
 let ok = false;
 
 try {
@@ -85,7 +87,8 @@ try {
   // A conversation: the model API is reached through the app's network layer,
   // a command runs in the platform's shell, a file is written in the workspace.
   await page.fill('#input', '在桌面应用里跑一下');
-  await page.keyboard.press('Enter');
+  await page.locator('#input').press('Enter');
+  await page.waitForSelector('.msg.user', { timeout: 30_000 });
   await page.waitForSelector('.approval:not([hidden])', { timeout: 30_000 });
   await page.click('.approval:not([hidden]) .seed-btn:nth-child(2)'); // always allow commands
   await page.waitForSelector('.approval:not([hidden])', { timeout: 30_000 });
@@ -101,7 +104,7 @@ try {
   const conversations = await api('GET', '/api/conversations');
   await api('PATCH', `/api/conversations/${conversations.conversations[0].id}`, { model: 'claude/claude-opus-5-5' });
   await page.fill('#input', '换成 Claude');
-  await page.keyboard.press('Enter');
+  await page.locator('#input').press('Enter');
   await page.waitForFunction(() => /Claude 通过桌面应用回答/.test(document.querySelector('#thread')?.textContent || ''), null, { timeout: 30_000 });
   assert.equal(anthropic.calls, 1);
   step('the Claude provider works from the desktop app');
@@ -118,13 +121,24 @@ try {
   ok = true;
 } catch (err) {
   console.error('\nDesktop check failed:', err);
+  console.error('model API calls:', openai.calls, anthropic.calls);
   try {
     const page = app.windows()[0];
-    console.error('thread:', (await page.textContent('#thread'))?.slice(0, 1500));
-    console.error('model API calls:', openai.calls, anthropic.calls);
-  } catch {
-    /* the window is gone */
+    const state = await page.evaluate(() => ({
+      url: location.href,
+      view: document.querySelector('#app')?.dataset.view,
+      input: document.querySelector('#input')?.value,
+      toasts: document.querySelector('#toasts')?.innerText,
+      thread: document.querySelector('#thread')?.innerText.slice(0, 1500),
+    }));
+    console.error('page:', state);
+    const shots = path.join(ROOT, 'test-results');
+    await fsp.mkdir(shots, { recursive: true });
+    await page.screenshot({ path: path.join(shots, `desktop-failure-${process.platform}.png`) });
+  } catch (e) {
+    console.error('(could not inspect the window:', e.message, ')');
   }
+  console.error('main process output:\n' + mainOutput.join('').slice(-4000));
   if (problems.length) console.error('page problems:', problems);
   process.exitCode = 1;
 } finally {

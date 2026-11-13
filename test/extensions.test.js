@@ -258,7 +258,7 @@ describe('the agent building extensions', () => {
     const { conv, result } = await chat(app, 'give yourself a dice tool');
     assert.equal(result.status, 'completed');
     const [written, report, rolled] = toolResults(conv);
-    assert.match(written.content, /^Created .*dice\/server\.js/);
+    assert.match(written.content, /^Created .*dice[\\/]server\.js/);
     assert.match(report.content, /dice — enabled\n {2}server: ok \(tools: roll\)/);
     assert.match(report.content, /Extension tools: roll\. Tools that are not in your tool list can be called with ext_call\./);
     assert.equal(rolled.content, 'rolled 20');

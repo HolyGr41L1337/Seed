@@ -44,6 +44,14 @@ jobs:
         if: runner.os == 'Linux'
         run: xvfb-run -a npm run test:desktop
 
+      - name: Keep screenshots of failed UI checks
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: test-results/
+          if-no-files-found: ignore
+
       - name: Web UI end-to-end test
         if: runner.os == 'Linux'
         run: |

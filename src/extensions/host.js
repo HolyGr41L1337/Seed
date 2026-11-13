@@ -586,6 +586,7 @@ function checkModuleSyntax(file, shownName) {
       clearTimeout(timer);
       if (code === 0 || !/SyntaxError/.test(stderr)) return resolve(null);
       const text = stderr
+        .replace(/\r\n/g, '\n')
         .split('\n')
         .filter((line) => !/^\s+at /.test(line) && !/^Node\.js v/.test(line))
         .join('\n')
