@@ -223,7 +223,14 @@ seed --safe                 # 不加载扩展启动
 
 ## 发布新版本
 
-安装包由 GitHub Actions 在真实的 macOS、Windows、Linux 机器上构建。推送一个以 `v` 开头的标签就会发布新版本：
+安装包由 GitHub Actions 在真实的 macOS、Windows、Linux 机器上构建。发布新版本最简单的方式是在网页上点一下：
+
+1. 打开仓库的 **Actions** 页面，左侧选 **Release**。
+2. 点右侧的 **Run workflow**，在 version 里填版本号（例如 `0.2.0`），点绿色的 **Run workflow**。
+
+大约 15 到 20 分钟后，[Releases](https://github.com/HolyGr41L1337/Seed/releases) 页面会出现 `v0.2.0`，附带上面表格里的所有文件。每个安装包在发布前都会被实际启动一遍，跑一次完整的对话流程来检查。version 留空则只构建、不发布，构建好的文件可以在这次运行的页面底部下载。
+
+也可以在自己电脑上推送标签来发布，效果一样：
 
 ```bash
 git tag v0.2.0
@@ -232,8 +239,6 @@ git tag v0.2.0
 ```bash
 git push origin v0.2.0
 ```
-
-大约 15 分钟后，[Releases](https://github.com/HolyGr41L1337/Seed/releases) 页面会出现 `v0.2.0`，附带上面表格里的所有文件。每个安装包在发布前都会被实际启动一遍，跑一次完整的对话流程来检查。也可以在 Actions 页面手动运行 Release 工作流，只构建、不发布。
 
 在自己电脑上打包：
 

@@ -1,8 +1,10 @@
 # Builds the desktop app for macOS, Windows and Linux, checks that each build
 # starts, and publishes a GitHub release.
 #
-#   Push a tag such as v0.2.0  → builds and publishes the release "v0.2.0".
-#   Run the workflow by hand   → builds; the files are kept as workflow artifacts.
+#   Actions → Release → Run workflow, version "0.2.0"  → builds and publishes "v0.2.0"
+#   Push a tag such as v0.2.0                         → the same
+#   Run workflow with the version left empty           → only builds; the files are
+#                                                        kept as workflow artifacts
 #
 # Optional signing (repository secrets; without them builds are unsigned and the
 # system warns on first launch):
@@ -15,6 +17,15 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish, for example 0.2.0. Leave empty to build without publishing.'
+        required: false
+        default: ''
+
+env:
+  # "v0.2.0" from a pushed tag or the version typed in; empty means build only.
+  RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || (inputs.version != '' && format('v{0}', inputs.version) || '') }}
 
 permissions:
   contents: write
@@ -53,10 +64,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Use the tag as the version
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Use the release version
+        if: env.RELEASE_TAG != ''
         shell: bash
-        run: npm version --no-git-tag-version --allow-same-version "${GITHUB_REF_NAME#v}"
+        run: |
+          tag="${RELEASE_TAG/#vv/v}" # "v0.2.0" typed in as the version
+          if ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::\"${tag#v}\" is not a version like 1.2.3"; exit 1
+          fi
+          npm version --no-git-tag-version --allow-same-version "${tag#v}"
 
       - name: Signing certificates (only when the secrets exist)
         shell: bash
@@ -113,7 +129,7 @@ jobs:
   publish:
     name: Publish the release
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.version != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -121,12 +137,18 @@ jobs:
           path: files
           merge-multiple: true
 
-      - name: Create the release
+      - name: Create the release (or add the files to one made on the website)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          RELEASE_TAG="${RELEASE_TAG/#vv/v}"
           ls -la files
-          gh release create "$GITHUB_REF_NAME" files/* \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "Seed $GITHUB_REF_NAME" \
-            --generate-notes
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" files/* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$RELEASE_TAG" files/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "Seed $RELEASE_TAG" \
+              --generate-notes
+          fi
