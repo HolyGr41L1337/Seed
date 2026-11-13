@@ -59,6 +59,7 @@ module.exports = {
   nsis: {
     oneClick: true,
     perMachine: false, // installs for the current user: no administrator rights needed
+    buildUniversalInstaller: false, // one installer per architecture, not one with both inside
     artifactName: '${productName}-Setup-${version}-${arch}.${ext}',
     shortcutName: 'Seed',
     createDesktopShortcut: true,
