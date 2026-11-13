@@ -22,6 +22,20 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const packaged = process.argv.includes('--app') ? path.resolve(process.argv[process.argv.indexOf('--app') + 1]) : null;
 const step = (name) => console.log(`  ✓ ${name}`);
 
+// On the Linux CI runners (virtual display, Chromium sandbox on) key presses sent by
+// Playwright never reach the page, although typing does. There the test
+// presses keys and clicks with DOM events, which still runs all of the app's
+// own code; everywhere else it uses real input events.
+const domInput = process.platform === 'linux' && !!process.env.CI;
+const pressEnter = (page) =>
+  domInput
+    ? page.$eval('#input', (el) => el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })))
+    : page.locator('#input').press('Enter');
+const click = async (page, selector) => {
+  await page.waitForSelector(selector, { timeout: 30_000 });
+  return domInput ? page.$eval(selector, (el) => el.click()) : page.click(selector);
+};
+
 const home = await fsp.mkdtemp(path.join(os.tmpdir(), 'seed-desktop-home-'));
 const work = await fsp.realpath(await fsp.mkdtemp(path.join(os.tmpdir(), 'seed-desktop-work-')));
 const token = crypto.randomBytes(18).toString('base64url');
@@ -92,14 +106,13 @@ try {
     document.addEventListener('keydown', (e) => window.__keys.push({ key: e.key, keyCode: e.keyCode, isComposing: e.isComposing, target: e.target?.id }), true);
   });
   await page.fill('#input', '在桌面应用里跑一下');
-  await page.locator('#input').press('Enter');
+  await pressEnter(page);
   await page.waitForSelector('.msg.user', { timeout: 30_000 });
-  await page.waitForSelector('.approval:not([hidden])', { timeout: 30_000 });
-  await page.click('.approval:not([hidden]) .seed-btn:nth-child(2)'); // always allow commands
-  await page.waitForSelector('.approval:not([hidden])', { timeout: 30_000 });
-  await page.click('.approval:not([hidden]) .seed-btn.primary'); // the file write
+  await click(page, '.approval:not([hidden]) .seed-btn:nth-child(2)'); // always allow commands
+  await page.waitForFunction(() => document.querySelectorAll('.tool[data-status="done"]').length >= 1, null, { timeout: 30_000 });
+  await click(page, '.approval:not([hidden]) .seed-btn.primary'); // the file write
   await page.waitForFunction(() => /命令和文件都没问题/.test(document.querySelector('#thread')?.textContent || ''), null, { timeout: 30_000 });
-  await page.click('.tool[data-tool="shell"] .tool-head');
+  await click(page, '.tool[data-tool="shell"] .tool-head');
   const shellOutput = await page.textContent('.tool[data-tool="shell"] .tool-body');
   assert.match(shellOutput, /seed-desktop-ok/, `shell output: ${shellOutput}`);
   assert.equal(await fsp.readFile(path.join(work, 'desktop-ok.txt'), 'utf8'), '你好，桌面\n');
@@ -109,7 +122,7 @@ try {
   const conversations = await api('GET', '/api/conversations');
   await api('PATCH', `/api/conversations/${conversations.conversations[0].id}`, { model: 'claude/claude-opus-5-5' });
   await page.fill('#input', '换成 Claude');
-  await page.locator('#input').press('Enter');
+  await pressEnter(page);
   await page.waitForFunction(() => /Claude 通过桌面应用回答/.test(document.querySelector('#thread')?.textContent || ''), null, { timeout: 30_000 });
   assert.equal(anthropic.calls, 1);
   step('the Claude provider works from the desktop app');
