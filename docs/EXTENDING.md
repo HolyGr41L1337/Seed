@@ -98,7 +98,7 @@ export function activate(seed) { /* ... */ return optionalCleanupFunction; }
 | Member | What it does |
 | --- | --- |
 | `seed.h(tag, props?, ...children)` | Creates an element. Props: `class`, `style` (string or object), `dataset`, `on<event>` handlers, attributes. Children: nodes, strings, arrays; `null` and `false` are skipped. |
-| `seed.icon(name, size?)` | Inline SVG icon. Names: `send, stop, plus, check, x, dot, chevron, copy, trash, settings, sidebar, search, edit, alert, terminal, file, globe, sparkle`. |
+| `seed.icon(name, size?)` | Inline SVG icon. Names: `send, stop, plus, check, x, dot, chevron, caret, down, copy, trash, settings, sidebar, search, edit, alert, terminal, file, folder, eye, globe, sparkle, refresh, plug, wrench, list, chip, shield`. |
 | `seed.tr(chinese, english)` | Picks the text for the interface language. `seed.lang` is `"zh"` or `"en"`. |
 | `seed.ui.mount(slot, content, options?)` | Puts content into a slot. `content` is a DOM node, or a function `(container) => cleanup?`. Options: `width` (number of pixels or CSS length; for `left` and `right`), `id`. Returns a function that removes it. |
 | `seed.ui.addStyle(cssText)` | Adds a stylesheet (a `style.css` file in the folder is loaded automatically). |

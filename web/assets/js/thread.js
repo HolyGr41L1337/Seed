@@ -18,12 +18,30 @@ let live = null; // the assistant message being streamed
 let statusEl = null;
 let stick = true;
 
+// A button that appears when the user has scrolled up, to jump back to the newest output.
+const toBottom = document.getElementById('to-bottom');
+toBottom.append(icon('down', 16));
+toBottom.title = t('toBottom');
+toBottom.setAttribute('aria-label', t('toBottom'));
+toBottom.addEventListener('click', () => {
+  viewEl.scrollTo({ top: viewEl.scrollHeight, behavior: 'smooth' });
+});
+
+function updateToBottom() {
+  toBottom.hidden = stick || viewEl.scrollHeight <= viewEl.clientHeight + 1;
+}
+
 viewEl.addEventListener('scroll', () => {
   stick = viewEl.scrollHeight - viewEl.scrollTop - viewEl.clientHeight < 90;
+  updateToBottom();
 });
 
 function scrollDown(force = false) {
-  if (force || stick) viewEl.scrollTop = viewEl.scrollHeight;
+  if (force || stick) {
+    viewEl.scrollTop = viewEl.scrollHeight;
+    stick = true;
+  }
+  updateToBottom();
 }
 
 function formatBytes(n) {
@@ -35,19 +53,29 @@ function oneLine(text, max = 160) {
   return line.length > max ? `${line.slice(0, max)}…` : line;
 }
 
-/** The short description shown in a tool call's header. */
+/** A long absolute path as "~/…/last/parts"; relative paths stay as they are. */
+function shortPath(p) {
+  let value = String(p ?? '');
+  const home = state.info?.homeDir;
+  if (home && (value === home || value.startsWith(`${home}/`) || value.startsWith(`${home}\\`))) value = `~${value.slice(home.length)}`;
+  if (value.length <= 48 || !/^([a-zA-Z]:)?[\\/~]/.test(value)) return value;
+  const parts = value.split(/[\\/]/).filter(Boolean);
+  return `…/${parts.slice(-3).join('/')}`;
+}
+
+/** The short description shown after the verb in a tool call's row. */
 function summarize(name, input = {}) {
   switch (name) {
     case 'shell':
-      return `$ ${oneLine(input.command)}`;
+      return oneLine(input.command);
     case 'read_file':
     case 'write_file':
     case 'edit_file':
     case 'list_dir':
-      return oneLine(input.path || '.');
+      return shortPath(oneLine(input.path || '.'));
     case 'glob':
     case 'grep':
-      return oneLine(input.pattern) + (input.path ? `  in ${input.path}` : '');
+      return oneLine(input.pattern) + (input.path ? `  ·  ${shortPath(input.path)}` : '');
     case 'fetch_url':
       return oneLine(input.url);
     case 'seed_api':
@@ -65,13 +93,40 @@ function summarize(name, input = {}) {
   }
 }
 
+const TOOL_ICONS = {
+  shell: 'terminal',
+  read_file: 'eye',
+  write_file: 'file',
+  edit_file: 'edit',
+  list_dir: 'folder',
+  glob: 'search',
+  grep: 'search',
+  fetch_url: 'globe',
+  seed_api: 'plug',
+  ui_eval: 'sparkle',
+  reload_extensions: 'refresh',
+  ext_call: 'plug',
+};
+
+function countLines(text) {
+  const value = String(text ?? '');
+  if (!value) return 0;
+  return value.split('\n').length - (value.endsWith('\n') ? 1 : 0);
+}
+
 function diffView(oldText, newText) {
-  const pre = h('pre');
+  const pre = h('pre', { class: 'diff' });
   for (const line of String(oldText).split('\n')) pre.append(h('span', { class: 'diff-line del' }, `- ${line}\n`));
   for (const line of String(newText).split('\n')) pre.append(h('span', { class: 'diff-line add' }, `+ ${line}\n`));
   return pre;
 }
 
+/**
+ * One tool call, shown as a compact row: an icon, a verb, what it acted on and
+ * a short result ("+3 −1", "12 matches", "exit code 1"). Click to see the full
+ * input and output. While it waits for approval it becomes a highlighted box
+ * with the preview and the buttons.
+ */
 class ToolCard {
   constructor(call) {
     this.id = call.id;
@@ -83,13 +138,24 @@ class ToolCard {
     this.liveText = '';
 
     this.mark = h('span', { class: 'tool-mark' });
+    this.verbEl = h('span', { class: 'tool-name' }, t(`toolVerbs.${this.name}`) === `toolVerbs.${this.name}` ? this.name : t(`toolVerbs.${this.name}`));
     this.summaryEl = h('span', { class: 'tool-summary' });
     this.metaEl = h('span', { class: 'tool-meta' });
-    this.head = h('div', { class: 'tool-head', onclick: () => this.toggle() }, this.mark, h('span', { class: 'tool-name' }, this.name), this.summaryEl, this.metaEl);
-    this.liveEl = h('div', { class: 'tool-live', hidden: true }, h('pre'));
+    this.chevron = h('span', { class: 'tool-chevron' }, icon('chevron', 14));
+    this.head = h(
+      'div',
+      { class: 'tool-head', role: 'button', tabindex: '0', onclick: () => this.toggle(), onkeydown: (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), this.toggle()) },
+      this.mark,
+      this.verbEl,
+      this.summaryEl,
+      this.metaEl,
+      this.chevron,
+    );
+    this.errorEl = h('div', { class: 'tool-error', hidden: true });
     this.approvalEl = h('div', { class: 'approval', hidden: true });
+    this.liveEl = h('div', { class: 'tool-live', hidden: true }, h('pre'));
     this.body = h('div', { class: 'tool-body', hidden: true });
-    this.el = h('div', { class: 'tool', dataset: { tool: this.name, id: this.id } }, this.head, this.approvalEl, this.liveEl, this.body);
+    this.el = h('div', { class: 'tool', dataset: { tool: this.name, id: this.id } }, this.head, this.errorEl, this.approvalEl, this.liveEl, this.body);
     this.setInput(this.input);
     this.setStatus('queued');
   }
@@ -97,7 +163,7 @@ class ToolCard {
   setInput(input) {
     this.input = input || {};
     this.summaryEl.textContent = summarize(this.name, this.input);
-    this.summaryEl.title = this.summaryEl.textContent;
+    this.summaryEl.title = this.input.path || this.input.command || this.summaryEl.textContent;
   }
 
   setStatus(status, meta) {
@@ -105,16 +171,47 @@ class ToolCard {
     this.el.dataset.status = status;
     clear(this.mark);
     if (status === 'running' || status === 'preparing') this.mark.append(h('span', { class: 'spinner' }));
-    else this.mark.append(icon(status === 'done' ? 'check' : status === 'error' || status === 'denied' ? 'x' : status === 'approval' ? 'alert' : 'dot', 14));
-    const labels = { preparing: t('preparing'), queued: '', approval: '', running: '', denied: t('denied'), interrupted: t('interrupted') };
-    this.metaEl.textContent = meta ?? labels[status] ?? '';
+    else if (status === 'error') this.mark.append(icon('x', 15));
+    else if (status === 'approval') this.mark.append(icon('alert', 15));
+    else this.mark.append(icon(TOOL_ICONS[this.name] || 'wrench', 15));
+    const labels = { preparing: t('preparing'), denied: t('denied'), interrupted: t('interrupted') };
+    clear(this.metaEl);
+    const value = meta ?? labels[status] ?? '';
+    if (value instanceof Node) this.metaEl.append(value);
+    else this.metaEl.textContent = value;
     if (status !== 'running') this.liveEl.hidden = true;
+  }
+
+  /** The short result shown at the end of the row once the tool has finished. */
+  resultMeta(ms) {
+    const { name, input, result } = this;
+    const parts = [];
+    const text = String(result?.content ?? '');
+    if (!result?.is_error) {
+      if (name === 'edit_file' && typeof input.old_string === 'string') {
+        parts.push(h('span', { class: 'meta-add' }, `+${countLines(input.new_string)}`), ' ', h('span', { class: 'meta-del' }, `−${countLines(input.old_string)}`));
+      } else if (name === 'write_file' && typeof input.content === 'string') {
+        parts.push(t('lines', countLines(input.content)));
+      } else if (name === 'grep' && !/^No matches/.test(text)) {
+        parts.push(t('matches', text.split('\n').filter((l) => /^[^\n]+?:\d+:/.test(l)).length));
+      } else if (name === 'glob' && !/^No files match/.test(text)) {
+        parts.push(t('filesFound', text.split('\n').filter((l) => l && !l.startsWith('[')).length));
+      } else if (name === 'shell') {
+        const code = result?.display?.exitCode ?? Number(/\[exit code: (-?\d+)\]\s*$/.exec(text)?.[1] ?? 0);
+        if (code) parts.push(h('span', { class: 'meta-del' }, t('exitCode', code)));
+      }
+    }
+    if (ms != null && ms >= 1000) parts.push(`${parts.length ? ' · ' : ''}${(ms / 1000).toFixed(1)}s`);
+    if (!parts.length) return '';
+    const span = h('span');
+    span.append(...parts);
+    return span;
   }
 
   appendOutput(text) {
     this.liveText = (this.liveText + text).slice(-6000);
     const pre = this.liveEl.firstChild;
-    pre.textContent = this.liveText.split('\n').slice(-9).join('\n');
+    pre.textContent = this.liveText.split('\n').slice(-8).join('\n');
     this.liveEl.hidden = this.status !== 'running';
     pre.scrollTop = pre.scrollHeight;
   }
@@ -123,7 +220,12 @@ class ToolCard {
     this.result = result;
     this.hideApproval();
     const declined = result.is_error && /declined|Not run:/.test(result.content || '');
-    this.setStatus(result.is_error ? (declined ? 'denied' : 'error') : 'done', ms != null && ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : undefined);
+    const status = result.is_error ? (declined ? 'denied' : 'error') : 'done';
+    this.setStatus(status, status === 'done' ? this.resultMeta(ms) : undefined);
+    if (status === 'error') {
+      this.errorEl.textContent = oneLine(String(result.content || '').replace(/^Error:\s*/, ''), 220);
+      this.errorEl.hidden = false;
+    }
     if (this.open) this.renderBody();
     const custom = toolRenderers.get(this.name);
     if (custom) this.renderCustom(custom);
@@ -146,6 +248,7 @@ class ToolCard {
 
   toggle(force) {
     this.open = force ?? !this.open;
+    this.el.classList.toggle('open', this.open);
     this.body.hidden = !this.open;
     if (this.open) this.renderBody();
   }
@@ -153,13 +256,13 @@ class ToolCard {
   renderBody() {
     clear(this.body);
     const { name, input, result } = this;
-    const section = (label, node) => h('div', h('div', { class: 'label' }, label), node);
+    const section = (label, node) => h('div', { class: 'tool-section' }, h('div', { class: 'label' }, label), node);
     if (name === 'edit_file' && typeof input.old_string === 'string') {
       this.body.append(section(input.path || t('input'), diffView(input.old_string, input.new_string ?? '')));
     } else if (name === 'write_file' && typeof input.content === 'string') {
       this.body.append(section(input.path || t('input'), h('pre', input.content.length > 6000 ? `${input.content.slice(0, 6000)}\n…` : input.content)));
     } else if (name === 'shell') {
-      this.body.append(section(t('input'), h('pre', input.command || '')));
+      this.body.append(section(t('input'), h('pre', `$ ${input.command || ''}`)));
     } else if (Object.keys(input).length) {
       this.body.append(section(t('input'), h('pre', JSON.stringify(input, null, 2))));
     }
@@ -176,7 +279,8 @@ class ToolCard {
     if (preview?.type === 'edit') previewEl = diffView(preview.old, preview.new);
     else if (preview?.type === 'write') previewEl = h('pre', preview.content);
     else if (preview?.type === 'json') previewEl = h('pre', JSON.stringify(preview.value, null, 2));
-    else if (approval.detail) previewEl = h('pre', approval.detail);
+    else if (approval.detail && this.name !== 'shell') previewEl = h('pre', approval.detail);
+    else if (approval.detail) previewEl = h('pre', `$ ${approval.detail}`);
 
     const buttons = [];
     const answer = async (decision) => {
@@ -190,10 +294,10 @@ class ToolCard {
     buttons.push(
       h('button', { type: 'button', class: 'seed-btn primary', onclick: () => answer('allow') }, t('allow')),
       h('button', { type: 'button', class: 'seed-btn', onclick: () => answer('allow_always') }, t('allowAlways')),
-      h('button', { type: 'button', class: 'seed-btn', onclick: () => answer('deny') }, t('deny')),
+      h('button', { type: 'button', class: 'seed-btn ghost', onclick: () => answer('deny') }, t('deny')),
     );
     this.approvalEl.append(
-      h('div', { class: 'approval-title' }, category),
+      h('div', { class: 'approval-title' }, h('span', { class: 'approval-kicker' }, t('needsApproval')), category),
       previewEl,
       h('div', { class: 'approval-buttons' }, buttons),
     );
@@ -207,19 +311,23 @@ class ToolCard {
   }
 }
 
-/** update_plan shows as a checklist instead of a generic tool card. */
+/** update_plan shows as a checklist instead of a generic tool row. */
 class PlanCard {
   constructor(call) {
     this.id = call.id;
     this.name = call.name;
-    this.el = h('div', { class: 'plan', dataset: { tool: 'update_plan' } });
+    this.titleEl = h('span', { class: 'plan-progress' });
+    this.list = h('div', { class: 'plan-steps' });
+    this.el = h('div', { class: 'plan', dataset: { tool: 'update_plan' } }, h('div', { class: 'plan-head' }, icon('list', 15), h('span', t('plan')), this.titleEl), this.list);
     this.setInput(call.input);
   }
 
   setInput(input) {
-    clear(this.el);
-    for (const step of Array.isArray(input?.steps) ? input.steps : []) {
-      this.el.append(h('div', { class: `plan-step ${step.status || 'pending'}` }, h('span', { class: 'box' }), h('span', String(step.text ?? ''))));
+    clear(this.list);
+    const steps = Array.isArray(input?.steps) ? input.steps : [];
+    this.titleEl.textContent = steps.length ? `${steps.filter((s) => s.status === 'done').length}/${steps.length}` : '';
+    for (const step of steps) {
+      this.list.append(h('div', { class: `plan-step ${step.status || 'pending'}` }, h('span', { class: 'box' }), h('span', String(step.text ?? ''))));
     }
   }
 
@@ -425,6 +533,7 @@ export const thread = {
     cards = new Map();
     clear(threadEl);
     stick = true;
+    updateToBottom();
   },
 
   /** Render a conversation snapshot, including a run that is in progress. */

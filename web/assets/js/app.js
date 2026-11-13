@@ -3,7 +3,7 @@
 import { api, connectEvents, storedToken, useToken } from './api.js';
 import { composer } from './composer.js';
 import { connectCard } from './connect.js';
-import { clear, h } from './dom.js';
+import { clear, h, icon } from './dom.js';
 import { actions, beforeSendHooks, loadExtensions, makeSeed, runEval, views } from './extensions.js';
 import { lang, t } from './i18n.js';
 import { emit, setState, state } from './state.js';
@@ -34,6 +34,39 @@ function shortPath(dir) {
   return shown;
 }
 
+function folderName(dir) {
+  const home = state.info?.homeDir;
+  if (home && dir === home) return '~';
+  return dir.split(/[\\/]/).filter(Boolean).pop() || dir;
+}
+
+/**
+ * Change the workspace. The desktop app opens the system folder picker; in a
+ * browser the /cd command is put into the input bar.
+ */
+async function chooseFolder() {
+  const current = state.conversation?.cwd || nextCwd || state.info?.cwd;
+  if (!window.seedDesktop?.chooseFolder) {
+    composer.setText('/cd ');
+    composer.focus();
+    return;
+  }
+  const folder = await window.seedDesktop.chooseFolder(current);
+  if (!folder) return;
+  try {
+    if (state.view === 'chat' && state.conversationId) {
+      const conv = await api.patch(`/api/conversations/${state.conversationId}`, { cwd: folder });
+      toast(t('cwdSet', conv.cwd));
+    } else {
+      await api.patch('/api/config', { workspace: folder }); // the default for new conversations
+      nextCwd = null;
+      toast(t('cwdSet', folder));
+    }
+  } catch (err) {
+    toast(err.message, { type: 'error' });
+  }
+}
+
 // ---- chrome: placeholder, hint line, connect card -----------------------------------
 
 function renderChrome() {
@@ -54,11 +87,16 @@ function renderChrome() {
   const model = conv?.model || state.config?.model;
   const mode = conv?.approval || state.config?.approval || 'ask';
   const cwd = conv?.cwd || nextCwd || state.info?.cwd;
+  // Small labels for the model, the workspace and the approval mode; each one opens its setting.
+  const chip = (iconName, label, title, onclick, warn = false) =>
+    h('button', { type: 'button', class: `chip${warn ? ' warn' : ''}`, title, onclick }, icon(iconName, 14), h('span', label));
   const status = h('span', { class: 'status' });
-  status.append(h('span', { class: model ? '' : 'warn', title: model || '' }, model ? model.split('/').slice(1).join('/') || model : t(isConnected() ? 'pickModel' : 'noModel')));
-  if (cwd) status.append(h('span', { title: cwd }, shortPath(cwd)));
-  status.append(h('span', { class: mode === 'full' ? 'warn' : '' }, t(`mode_${mode}`)));
-  if (state.safeMode) status.append(h('span', { class: 'warn' }, t('safeMode')));
+  status.append(
+    chip('chip', model ? model.split('/').slice(1).join('/') || model : t(isConnected() ? 'pickModel' : 'noModel'), model ? `${t('chipModel')}: ${model}` : '', () => modelCommand(''), !model),
+  );
+  if (cwd) status.append(chip('folder', folderName(cwd), `${t('workspace')}: ${cwd}`, () => chooseFolder()));
+  status.append(chip('shield', t(`mode_${mode}`), t('commands.mode'), () => modeCommand(''), mode === 'full'));
+  if (state.safeMode) status.append(h('span', { class: 'chip warn' }, t('safeMode')));
   hintEl.append(status);
 
   if (state.view === 'home' && !isConnected() && connectEl.hidden) showConnect();
@@ -282,6 +320,46 @@ async function chooseModel(ref) {
   toast(t('modelSet', ref));
 }
 
+/**
+ * A list to choose one item from: the current one is marked, every row is
+ * clickable, and long lists get a search box (OpenRouter lists hundreds of models).
+ * items: [{ label, sub?, value, current?, group? }]
+ */
+function picker(items, onPick, { searchPlaceholder } = {}) {
+  const list = h('div', { class: 'picker-list', role: 'listbox' });
+  const search = items.length > 8 ? h('input', { class: 'seed-input picker-search', type: 'search', placeholder: searchPlaceholder || '', spellcheck: 'false' }) : null;
+  const draw = () => {
+    const q = (search?.value || '').trim().toLowerCase();
+    clear(list);
+    let group = null;
+    let shown = 0;
+    for (const item of items) {
+      if (q && !`${item.label} ${item.sub || ''} ${item.group || ''}`.toLowerCase().includes(q)) continue;
+      if (item.group && item.group !== group) {
+        group = item.group;
+        list.append(h('div', { class: 'picker-group' }, group));
+      }
+      shown++;
+      list.append(
+        h(
+          'button',
+          { type: 'button', class: `picker-item${item.current ? ' current' : ''}`, role: 'option', 'aria-selected': String(!!item.current), onclick: () => onPick(item) },
+          h('span', { class: 'picker-check' }, item.current ? icon('check', 15) : null),
+          h('span', { class: 'picker-text' }, h('span', { class: 'picker-label' }, item.label), item.sub ? h('span', { class: 'picker-sub' }, item.sub) : null),
+        ),
+      );
+    }
+    if (!shown) list.append(h('div', { class: 'picker-empty seed-muted' }, '—'));
+  };
+  search?.addEventListener('input', draw);
+  search?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') list.querySelector('.picker-item')?.click();
+  });
+  draw();
+  if (search) setTimeout(() => search.focus(), 0);
+  return h('div', { class: 'picker' }, search, list);
+}
+
 async function modelCommand(arg) {
   if (arg) {
     try {
@@ -293,41 +371,42 @@ async function modelCommand(arg) {
   }
   if (!isConnected()) return showConnect({ manual: true });
   const body = h('div', h('p', { class: 'seed-muted' }, '…'));
-  const dialog = modal({ title: t('modelsTitle'), content: body, width: 560 });
+  let dialog;
+  const connectMore = h('button', { type: 'button', class: 'link-button picker-footer', onclick: () => (dialog.close(), showConnect({ manual: true })) }, `+ ${t('connectAnother')}`);
+  dialog = modal({ title: t('modelsTitle'), content: body, width: 560 });
   try {
     const data = await api.get('/api/models');
     const current = state.conversation?.model || data.current;
-    clear(body);
+    const items = [];
     for (const provider of data.providers) {
-      body.append(h('div', { class: 'group-title seed-muted', style: { fontSize: '12.5px', margin: '10px 0 2px' } }, provider.name));
-      if (provider.error) body.append(h('div', { class: 'connect-error' }, provider.error));
-      const card = h('div', { class: 'card', style: { margin: '4px 0', padding: '4px 12px' } });
       for (const m of provider.models) {
-        const isCurrent = m.ref === current;
-        card.append(
-          row(
-            m.name === m.id ? m.id : `${m.name} (${m.id})`,
-            isCurrent
-              ? h('span', { class: 'seed-muted' }, t('current'))
-              : h('button', {
-                  type: 'button',
-                  class: 'seed-btn small',
-                  onclick: async () => {
-                    try {
-                      await chooseModel(m.ref);
-                      dialog.close();
-                    } catch (err) {
-                      toast(err.message, { type: 'error' });
-                    }
-                  },
-                }, t('use')),
-          ),
-        );
+        items.push({ label: m.id, sub: m.name !== m.id ? m.name : '', value: m.ref, current: m.ref === current, group: provider.name });
       }
-      if (provider.models.length) body.append(card);
     }
+    // The model in use may not be in the list the API returns.
+    if (current && !items.some((i) => i.value === current)) {
+      const provider = data.providers.find((p) => current.startsWith(`${p.id}/`));
+      items.unshift({ label: current.split('/').slice(1).join('/'), value: current, current: true, group: provider?.name || '' });
+    }
+    clear(body).append(
+      ...data.providers.filter((p) => p.error).map((p) => h('div', { class: 'connect-error', style: { marginBottom: '8px' } }, `${p.name}: ${p.error}`)),
+      picker(
+        items,
+        async (item) => {
+          if (item.current) return dialog.close();
+          try {
+            await chooseModel(item.value);
+            dialog.close();
+          } catch (err) {
+            toast(err.message, { type: 'error' });
+          }
+        },
+        { searchPlaceholder: t('searchModels') },
+      ),
+      connectMore,
+    );
   } catch (err) {
-    clear(body).append(h('div', { class: 'connect-error' }, err.message));
+    clear(body).append(h('div', { class: 'connect-error' }, err.message), connectMore);
   }
 }
 
@@ -344,18 +423,11 @@ async function modeCommand(arg) {
   }
   const current = state.conversation?.approval || state.config.approval;
   let dialog;
-  const card = h('div', { class: 'card', style: { margin: 0, padding: '4px 12px' } });
-  for (const mode of modes) {
-    card.append(
-      row(
-        h('span', h('code', mode), `  ${t(`mode_${mode}`)}`),
-        mode === current
-          ? h('span', { class: 'seed-muted' }, t('current'))
-          : h('button', { type: 'button', class: 'seed-btn small', onclick: () => set(mode).then(() => dialog.close(), (err) => toast(err.message, { type: 'error' })) }, t('use')),
-      ),
-    );
-  }
-  dialog = modal({ title: t('commands.mode'), content: card });
+  const list = picker(
+    modes.map((mode) => ({ label: t(`mode_${mode}`), sub: t(`modeDesc_${mode}`), value: mode, current: mode === current })),
+    (item) => (item.current ? dialog.close() : set(item.value).then(() => dialog.close(), (err) => toast(err.message, { type: 'error' }))),
+  );
+  dialog = modal({ title: t('modeTitle'), content: list, width: 520 });
 }
 
 async function cdCommand(arg) {
@@ -543,6 +615,8 @@ async function signIn(token) {
 
 async function boot() {
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  // In the desktop app: room for the macOS window buttons, and the native folder picker.
+  if (window.seedDesktop) document.documentElement.classList.add('desktop', `desktop-${window.seedDesktop.platform}`);
   const url = new URL(location.href);
   if (url.searchParams.get('safe') === '1') state.safeMode = true;
   const token = url.searchParams.get('token');

@@ -4,7 +4,8 @@
 // with the command line.
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-import { BrowserWindow, Menu, app as electron, clipboard, dialog, nativeTheme, session, shell } from 'electron';
+import { fileURLToPath } from 'node:url';
+import { BrowserWindow, Menu, app as electron, clipboard, dialog, ipcMain, nativeTheme, session, shell } from 'electron';
 import { App } from '../src/app.js';
 import { APP_DIR, VERSION } from '../src/util.js';
 
@@ -77,7 +78,15 @@ function createWindow() {
     autoHideMenuBar: !IS_MAC,
     backgroundColor: nativeTheme.shouldUseDarkColors ? '#0f1210' : '#ffffff',
     icon: process.platform === 'linux' ? path.join(APP_DIR, 'build', 'icon-win.png') : undefined,
-    webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false },
+    // macOS: no title bar; the traffic lights sit over the page, which leaves room for them.
+    ...(IS_MAC ? { titleBarStyle: 'hiddenInset', trafficLightPosition: { x: 16, y: 16 } } : {}),
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      spellcheck: false,
+      preload: path.join(path.dirname(fileURLToPath(import.meta.url)), 'preload.cjs'),
+    },
   });
   win.once('ready-to-show', () => win.show());
 
@@ -102,13 +111,25 @@ function createWindow() {
   win.loadURL(address.urlWithToken);
 }
 
-async function openFolder() {
+async function pickFolder(defaultPath) {
   const { canceled, filePaths } = await dialog.showOpenDialog(win, {
     title: tr('选择工作目录', 'Choose the workspace folder'),
-    defaultPath: seed.cwd,
+    defaultPath: defaultPath || seed.cwd,
     properties: ['openDirectory', 'createDirectory'],
   });
-  if (canceled || !filePaths[0]) return;
+  return canceled || !filePaths[0] ? null : filePaths[0];
+}
+
+// The page asks for the folder picker (the workspace label under the input bar).
+ipcMain.handle('seed:choose-folder', (event, defaultPath) => {
+  if (!address || new URL(event.senderFrame?.url || 'about:blank').origin !== new URL(address.url).origin) return null;
+  return pickFolder(defaultPath);
+});
+
+async function openFolder() {
+  const folder = await pickFolder();
+  if (!folder) return;
+  const filePaths = [folder];
   await seed.config.update({ workspace: filePaths[0] });
   await runInPage(`location.hash = '#/'`);
   toast(tr(`新对话将在 ${filePaths[0]} 中进行`, `New conversations will work in ${filePaths[0]}`));

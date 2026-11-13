@@ -84,6 +84,9 @@ try {
   assert.equal(await page.title(), 'Seed');
   assert.equal(await page.getAttribute('#app', 'data-view'), 'home');
   assert.equal(await page.locator('#connect').isHidden(), true, 'a configured app opens on the bare input bar');
+  assert.equal(await page.evaluate(() => window.seedDesktop?.platform), process.platform, 'the desktop bridge (folder picker) is loaded');
+  assert.equal(await page.evaluate(() => document.documentElement.classList.contains(`desktop-${window.seedDesktop.platform}`)), true);
+  assert.equal(await page.evaluate(() => typeof window.require), 'undefined', 'the page has no Node.js access');
   step(`the window opens on the input bar (${packaged ? 'packaged build' : 'from source'}, ${process.platform})`);
 
   const menu = await app.evaluate(({ Menu }) => Menu.getApplicationMenu().items.flatMap((i) => [i.label, ...(i.submenu?.items || []).map((s) => s.label)]));

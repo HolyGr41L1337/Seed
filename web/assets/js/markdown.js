@@ -5,6 +5,7 @@
 // shown as links instead of being loaded (a remote image URL would let a
 // page learn things about the conversation just by being requested).
 import { h } from './dom.js';
+import { highlight } from './highlight.js';
 import { t } from './i18n.js';
 
 const FENCE = /^(\s{0,3})(`{3,}|~{3,})\s*([^\s`]*)[^`]*$/;
@@ -208,7 +209,7 @@ function codeBlock(code, lang) {
     'div',
     { class: 'code' },
     h('div', { class: 'code-head' }, h('span', lang || ''), copy),
-    h('pre', h('code', lang ? { class: `language-${lang}`, dataset: { lang } } : null, code)),
+    h('pre', h('code', lang ? { class: `language-${lang}`, dataset: { lang } } : null, highlight(code, lang))),
   );
 }
 
