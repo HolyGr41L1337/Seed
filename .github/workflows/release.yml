@@ -27,10 +27,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Builds both the Apple silicon and the Intel app. An Intel runner, because
+          # Apple silicon runners are often unavailable for long stretches; CI already
+          # runs the app on Apple silicon. The smoke test starts the Intel build here.
           - name: macOS
-            os: macos-latest
+            os: macos-15-intel
             target: --mac
-            smoke: dist/mac-arm64/Seed.app/Contents/MacOS/Seed
+            smoke: dist/mac/Seed.app/Contents/MacOS/Seed
           - name: Windows
             os: windows-latest
             target: --win
