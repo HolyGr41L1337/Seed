@@ -1,0 +1,3 @@
+.history-sidebar .history-delete { width: 26px; height: 26px; opacity: 0; }
+.history-sidebar .seed-item:hover .history-delete,
+.history-sidebar .history-delete:focus-visible { opacity: 1; }

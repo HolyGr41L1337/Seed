@@ -1,0 +1,5 @@
+{
+  "name": "memory",
+  "description": "Lets the agent remember notes across conversations.",
+  "version": "1.0.0"
+}

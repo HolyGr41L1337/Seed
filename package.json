@@ -1,0 +1,32 @@
+{
+  "name": "seed-harness",
+  "version": "0.1.0",
+  "description": "Seed — a self-growing AI agent harness. It starts as a single input bar; everything else is built by the AI.",
+  "type": "module",
+  "bin": {
+    "seed": "bin/seed.js"
+  },
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node bin/seed.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=20.6"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0"
+  },
+  "private": true,
+  "files": [
+    "bin",
+    "src",
+    "web",
+    "docs",
+    "examples",
+    "README.md"
+  ]
+}
