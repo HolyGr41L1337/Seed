@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="191" height="20" role="img" aria-label="API: REST · OpenAI-compatible">
+  <title>API: REST · OpenAI-compatible</title>
+  <clipPath id="r"><rect width="191" height="20" rx="5"/></clipPath>
+  <g clip-path="url(#r)">
+    <rect width="35" height="20" fill="#3d444d"/>
+    <rect x="35" width="156" height="20" fill="#8250df"/>
+  </g>
+  <g fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Helvetica,Arial,sans-serif" font-size="11" font-weight="600" text-anchor="middle">
+    <text x="17.5" y="14" textLength="19" lengthAdjust="spacingAndGlyphs">API</text>
+    <text x="113" y="14" textLength="140" lengthAdjust="spacingAndGlyphs">REST · OpenAI-compatible</text>
+  </g>
+</svg>
