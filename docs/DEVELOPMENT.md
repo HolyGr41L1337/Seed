@@ -56,7 +56,7 @@ src/
 web/                   界面（原生 JavaScript，无构建步骤）
 docs/                  API.md、EXTENDING.md、ARCHITECTURE.md、DEVELOPMENT.md
 examples/extensions/   示例扩展
-scripts/               生成 README 配图的脚本
+scripts/               生成 README 配图、生成发布说明的脚本
 test/                  自动化测试
 ```
 
@@ -79,7 +79,7 @@ node test/e2e/desktop.mjs   # 桌面应用冒烟测试（需要 Playwright；加
 1. 打开仓库的 **Actions** 页面，左侧选 **Release**。
 2. 点右侧的 **Run workflow**，在 version 里填版本号（例如 `0.2.0`），点绿色的 **Run workflow**。
 
-大约 15 到 20 分钟后，[Releases](https://github.com/HolyGr41L1337/Seed/releases) 页面会出现 `v0.2.0`，附带各个系统的安装包。每个安装包在发布前都会被实际启动一遍，跑一次完整的对话流程来检查。version 留空则只构建、不发布，构建好的文件可以在这次运行的页面底部下载。
+大约 15 到 20 分钟后，[Releases](https://github.com/HolyGr41L1337/Seed/releases) 页面会出现 `v0.2.0`，附带各个系统的安装包，说明的开头是一张“哪个系统下载哪个文件”的表格（由 `scripts/release-notes.sh` 生成）。每个安装包在发布前都会被实际启动一遍，跑一次完整的对话流程来检查。version 留空则只构建、不发布，构建好的文件可以在这次运行的页面底部下载。
 
 也可以在自己电脑上推送标签来发布，效果一样：
 
