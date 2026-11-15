@@ -16,11 +16,13 @@
 </p>
 
 <p>
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-macos.svg" alt="Télécharger pour macOS" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg"><img src="docs/images/download-macos-arm64.svg" alt="Télécharger pour macOS (puce Apple)" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-windows.svg" alt="Télécharger pour Windows" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg"><img src="docs/images/download-macos-x64.svg" alt="Télécharger pour macOS (Intel)" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-linux.svg" alt="Télécharger pour Linux" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe"><img src="docs/images/download-windows.svg" alt="Télécharger pour Windows" height="46"></a>
+&nbsp;
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage"><img src="docs/images/download-linux.svg" alt="Télécharger pour Linux" height="46"></a>
 </p>
 
 [Téléchargement](#téléchargement) · [Connecter un modèle](#connecter-une-api-de-modèle) · [Fonctionnalités par l'IA](#laisser-lia-ajouter-des-fonctionnalités) · [API](#utiliser-seed-via-lapi) · [Documentation](#documentation-et-développement)
@@ -35,11 +37,11 @@ La différence, c'est l'interface : au départ, elle se réduit à une barre de 
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-en-dark.gif">
-  <img src="docs/images/demo-en-light.gif" width="860" alt="Démonstration : on demande à Seed « Ajoute une barre latérale d'historique des conversations à cette application » ; l'IA écrit une extension et la barre latérale apparaît aussitôt">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-fr-dark.gif">
+  <img src="docs/images/demo-fr-light.gif" width="860" alt="Démonstration : on demande à Seed « Ajoute une barre latérale d'historique des conversations à cette application » ; l'IA écrit une extension et la barre latérale apparaît aussitôt">
 </picture>
 <br>
-<sub>Dites-lui « Ajoute une barre latérale d'historique des conversations à cette application » : l'IA écrit une extension et la barre latérale apparaît aussitôt.<br>Enregistré dans la vraie application ; les réponses du modèle sont scénarisées (interface affichée en anglais).</sub>
+<sub>Dites-lui « Ajoute une barre latérale d'historique des conversations à cette application » : l'IA écrit une extension et la barre latérale apparaît aussitôt.<br>Enregistré dans la vraie application ; les réponses du modèle sont scénarisées.</sub>
 </div>
 
 ## Fonctionnalités
@@ -83,8 +85,8 @@ Voici à quoi ressemble une tâche de programmation ordinaire : la lecture de fi
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-en-dark.png">
-  <img src="docs/images/chat-en-light.png" width="760" alt="Une tâche de programmation : lister le dossier, lire un fichier, le modifier, exécuter une commande, puis résumer">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-fr-dark.png">
+  <img src="docs/images/chat-fr-light.png" width="760" alt="Une tâche de programmation : lister le dossier, lire un fichier, le modifier, exécuter une commande, puis résumer">
 </picture>
 </div>
 
@@ -103,20 +105,20 @@ flowchart LR
 
 ## Téléchargement
 
-Sur la page [Releases](https://github.com/HolyGr41L1337/Seed/releases/latest), cliquez sous **Assets** sur le fichier qui correspond à votre système :
+Cliquez sur un nom de fichier dans le tableau pour télécharger la dernière version (toutes les versions sont sur la page [Releases](https://github.com/HolyGr41L1337/Seed/releases)) :
 
 | Système | Fichier | Installation |
 | --- | --- | --- |
-| macOS (puce Apple : M1/M2/M3/M4…) | `Seed-<version>-mac-arm64.dmg` | Ouvrez-le et glissez Seed dans Applications |
-| macOS (Intel) | `Seed-<version>-mac-x64.dmg` | Idem |
-| Windows (la plupart des PC) | `Seed-Setup-<version>-x64.exe` | Double-cliquez pour installer ; l'application s'ouvre ensuite. Aucun droit d'administrateur requis |
-| Windows (sans installation) | `Seed-<version>-win-x64.zip` | Décompressez, puis double-cliquez sur `Seed.exe` |
-| Windows (PC ARM) | `Seed-Setup-<version>-arm64.exe` | Double-cliquez pour installer |
-| Linux | `Seed-<version>-linux-x86_64.AppImage` | Rendez-le exécutable, puis double-cliquez |
+| macOS (puce Apple : M1/M2/M3/M4…) | [`Seed-mac-arm64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg) | Ouvrez-le et glissez Seed dans Applications |
+| macOS (Intel) | [`Seed-mac-x64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg) | Idem |
+| Windows (la plupart des PC) | [`Seed-Setup-x64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe) | Double-cliquez pour installer ; l'application s'ouvre ensuite. Aucun droit d'administrateur requis |
+| Windows (sans installation) | [`Seed-win-x64.zip`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-win-x64.zip) | Décompressez, puis double-cliquez sur `Seed.exe` |
+| Windows (PC ARM) | [`Seed-Setup-arm64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-arm64.exe) | Double-cliquez pour installer |
+| Linux | [`Seed-linux-x86_64.AppImage`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage) | Rendez-le exécutable, puis double-cliquez |
 
 Vous ne savez pas quelle puce équipe votre Mac ? Ouvrez le menu Apple → « À propos de ce Mac ». « Puce : Apple M… » correspond à arm64 ; « Processeur : Intel » correspond à x64.
 
-L'application s'ouvre sur une fenêtre réduite à la barre de saisie, avec en dessous une carte « Connect a model API » : choisissez un fournisseur, saisissez votre clé d'API, cliquez sur « Connect », et c'est prêt.
+L'application s'ouvre sur une fenêtre réduite à la barre de saisie, avec en dessous une carte « Connecter une API de modèle » : choisissez un fournisseur, saisissez votre clé d'API, cliquez sur « Connecter », et c'est prêt. L'interface suit la langue du système : chinois, anglais, japonais, français ou russe.
 
 > [!IMPORTANT]
 > Les installeurs ne sont pas encore signés avec les certificats payants d'Apple et de Microsoft ; le système bloque donc le premier lancement. Effectuez une seule fois la manipulation ci-dessous, et l'application s'ouvrira ensuite normalement.
@@ -134,9 +136,9 @@ L'application s'ouvre sur une fenêtre réduite à la barre de saisie, avec en d
 
 <br>
 
-- **File → Open Folder…** (`Cmd/Ctrl+O`) : le dossier dans lequel l'IA lit et écrit des fichiers et exécute des commandes. Par défaut, c'est votre dossier personnel ; mieux vaut choisir un projet précis.
-- **File → Copy API Connection Info** : copie l'adresse locale de l'API et le jeton d'accès, pour y connecter d'autres programmes (voir [Utiliser Seed via l'API](#utiliser-seed-via-lapi)).
-- **View → Safe Mode** : quand une extension a cassé l'interface, ouvre une fenêtre qui ne charge aucune extension d'interface.
+- **Fichier → Ouvrir un dossier…** (`Cmd/Ctrl+O`) : le dossier dans lequel l'IA lit et écrit des fichiers et exécute des commandes. Par défaut, c'est votre dossier personnel ; mieux vaut choisir un projet précis.
+- **Fichier → Copier les informations de connexion à l'API** : copie l'adresse locale de l'API et le jeton d'accès, pour y connecter d'autres programmes (voir [Utiliser Seed via l'API](#utiliser-seed-via-lapi)).
+- **Affichage → Mode sans échec** : quand une extension a cassé l'interface, ouvre une fenêtre qui ne charge aucune extension d'interface.
 
 L'application de bureau utilise automatiquement les réglages de proxy du système (par exemple un proxy système activé par un outil de proxy) : aucun réglage supplémentaire n'est nécessaire pour joindre OpenAI, Anthropic et les autres services. Sur macOS, l'application continue de tourner après la fermeture de la fenêtre (l'API reste disponible) ; cliquez sur son icône dans le Dock pour rouvrir la fenêtre, et quittez complètement avec `Cmd+Q`.
 
@@ -155,7 +157,7 @@ Le plus simple est de passer par la carte de connexion de l'application (tapez `
 | `OPENAI_API_KEY` (avec `OPENAI_BASE_URL` en option) | OpenAI |
 | `OPENROUTER_API_KEY` | OpenRouter |
 
-Pour tout autre fournisseur, choisissez « Custom (OpenAI-compatible) » ou « Custom (Anthropic-compatible) » dans la carte de connexion, puis saisissez l'URL de base, la clé et le nom du modèle.
+Pour tout autre fournisseur, choisissez « Personnalisé (compatible OpenAI) » ou « Personnalisé (compatible Anthropic) » dans la carte de connexion, puis saisissez l'URL de base, la clé et le nom du modèle.
 
 Pour changer de modèle, tapez `/model` et choisissez dans la liste, ou tapez `/model deepseek/deepseek-reasoner`.
 
@@ -213,12 +215,12 @@ Les extensions peuvent ajouter des éléments d'interface (barres latérales, pa
 
 ## Modes d'approbation
 
-Avant toute action ayant des conséquences, l'IA vous demande votre accord. La carte propose trois choix : « Allow » (autoriser), « Always allow this kind in this conversation » (toujours autoriser ce type d'action dans cette conversation) et « Decline » (refuser).
+Avant toute action ayant des conséquences, l'IA vous demande votre accord. La carte propose trois choix : « Autoriser », « Toujours autoriser ce type d'action dans cette conversation » et « Refuser ».
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/approval-en-dark.png">
-  <img src="docs/images/approval-en-light.png" width="760" alt="Avant de modifier un fichier, Seed vous montre la modification">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/approval-fr-dark.png">
+  <img src="docs/images/approval-fr-light.png" width="760" alt="Avant de modifier un fichier, Seed vous montre la modification">
 </picture>
 </div>
 
@@ -232,7 +234,7 @@ Changez de mode avec `/mode`. Après un refus, l'IA s'arrête et attend vos inst
 
 ## Utiliser Seed via l'API
 
-Le jeton d'accès s'affiche au démarrage, et `seed url` permet de le revoir à tout moment. Dans l'application de bureau, utilisez le menu File → Copy API Connection Info.
+Le jeton d'accès s'affiche au démarrage, et `seed url` permet de le revoir à tout moment. Dans l'application de bureau, utilisez le menu Fichier → Copier les informations de connexion à l'API.
 
 **Comme un point d'accès OpenAI** (URL de base `http://127.0.0.1:7333/v1`, le jeton d'accès comme clé d'API, modèle `seed`) :
 
@@ -310,7 +312,6 @@ La version en ligne de commande s'installe depuis les sources ; voir [Documentat
 - Pas de bac à sable au niveau du système (voir ci-dessus).
 - MCP, la recherche web et une interface d'envoi d'images ne sont pas encore intégrés (l'API accepte déjà les blocs de contenu image). L'IA peut les ajouter sous forme d'extensions.
 - Les tests automatisés et le test de fumée de l'application de bureau tournent sous Linux, macOS et Windows (GitHub Actions), mais l'application n'a pas encore connu d'usage prolongé sur les Mac et les PC Windows de vrais utilisateurs.
-- L'interface existe pour l'instant en chinois et en anglais, selon la langue du système. Les images de cette page montrent l'interface en anglais.
 
 ## Documentation et développement
 
@@ -318,8 +319,8 @@ La version en ligne de commande s'installe depuis les sources ; voir [Documentat
 | --- | --- |
 | [docs/EXTENDING.md](docs/EXTENDING.md) | Référence des extensions (en anglais). C'est ce que lit l'IA quand elle ajoute une fonctionnalité |
 | [docs/API.md](docs/API.md) | Référence de l'API HTTP (en anglais) |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Comment les différentes parties s'articulent, et pourquoi les choix de conception clés sont ce qu'ils sont (en chinois) |
-| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Exécution depuis les sources, structure du projet, tests, publication, signature des installeurs (en chinois) |
+| [docs/ARCHITECTURE.en.md](docs/ARCHITECTURE.en.md) | Comment les différentes parties s'articulent, et pourquoi les choix de conception clés sont ce qu'ils sont (en anglais) |
+| [docs/DEVELOPMENT.en.md](docs/DEVELOPMENT.en.md) | Exécution depuis les sources, structure du projet, tests, publication, signature des installeurs (en anglais) |
 
 L'exécution depuis les sources nécessite Node.js 22 ou une version ultérieure :
 

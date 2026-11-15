@@ -2,15 +2,15 @@
 // connected, and again on /connect.
 import { api } from './api.js';
 import { clear, h } from './dom.js';
-import { t, tr } from './i18n.js';
+import { t } from './i18n.js';
 import { state } from './state.js';
 
 let presetsCache = null;
 
 function presetLabel(preset) {
-  if (preset.id === 'custom') return tr('自定义（OpenAI 兼容）', 'Custom (OpenAI-compatible)');
-  if (preset.id === 'custom-anthropic') return tr('自定义（Anthropic 兼容）', 'Custom (Anthropic-compatible)');
-  if (preset.id === 'ollama') return tr('Ollama（本地）', 'Ollama (local)');
+  if (preset.id === 'custom') return t('presetCustom');
+  if (preset.id === 'custom-anthropic') return t('presetCustomAnthropic');
+  if (preset.id === 'ollama') return t('presetOllama');
   return preset.name;
 }
 
@@ -78,7 +78,7 @@ export async function connectCard({ onDone, onCancel }) {
         name: 'seed-api-key',
         autocomplete: 'off',
         spellcheck: 'false',
-        placeholder: saved?.keyHint ? tr(`已保存 ${saved.keyHint}，留空则沿用`, `saved ${saved.keyHint}; leave empty to keep it`) : current.keyHint || (current.custom ? t('keyOptional') : ''),
+        placeholder: saved?.keyHint ? t('keySaved', saved.keyHint) : current.keyHint || (current.custom ? t('keyOptional') : ''),
         value: v.apiKey,
         oninput: (e) => (v.apiKey = e.target.value),
       });

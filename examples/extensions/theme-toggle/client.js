@@ -8,7 +8,7 @@ export async function activate(seed) {
 
   let theme = await seed.storage.get('theme', 'auto'); // 'auto' | 'light' | 'dark'
 
-  const button = h('button', { type: 'button', class: 'icon-button', id: 'theme-toggle', title: tr('切换主题', 'Switch theme') });
+  const button = h('button', { type: 'button', class: 'icon-button', id: 'theme-toggle', title: tr('切换主题', 'Switch theme', { ja: 'テーマを切り替える', fr: 'Changer de thème', ru: 'Сменить тему' }) });
 
   function apply() {
     if (theme === 'auto') delete root.dataset.theme;
@@ -29,9 +29,9 @@ export async function activate(seed) {
   seed.commands.register({
     name: 'theme',
     args: '[light|dark|auto]',
-    description: tr('切换浅色 / 深色主题', 'Switch between light and dark'),
+    description: tr('切换浅色 / 深色主题', 'Switch between light and dark', { ja: 'ライト／ダークのテーマを切り替える', fr: 'Basculer entre thème clair et thème sombre', ru: 'Переключить светлую и тёмную тему' }),
     run: (arg) => {
-      if (!['light', 'dark', 'auto'].includes(arg)) return seed.ui.toast(tr('用法：/theme light | dark | auto', 'Usage: /theme light | dark | auto'));
+      if (!['light', 'dark', 'auto'].includes(arg)) return seed.ui.toast(tr('用法：/theme light | dark | auto', 'Usage: /theme light | dark | auto', { ja: '使い方：/theme light | dark | auto', fr: 'Usage : /theme light | dark | auto', ru: 'Использование: /theme light | dark | auto' }));
       return set(arg);
     },
   });

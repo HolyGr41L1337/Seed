@@ -16,11 +16,13 @@
 </p>
 
 <p>
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-macos.svg" alt="macOS 版をダウンロード" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg"><img src="docs/images/download-macos-arm64.svg" alt="macOS 版（Apple シリコン）をダウンロード" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-windows.svg" alt="Windows 版をダウンロード" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg"><img src="docs/images/download-macos-x64.svg" alt="macOS 版（Intel）をダウンロード" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-linux.svg" alt="Linux 版をダウンロード" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe"><img src="docs/images/download-windows.svg" alt="Windows 版をダウンロード" height="46"></a>
+&nbsp;
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage"><img src="docs/images/download-linux.svg" alt="Linux 版をダウンロード" height="46"></a>
 </p>
 
 [ダウンロード](#ダウンロードとインストール) · [モデル API に接続する](#モデル-api-に接続する) · [AI に機能を追加させる](#ai-に機能を追加させる) · [API から利用する](#api-から利用する) · [ドキュメント](#ドキュメントと開発)
@@ -35,11 +37,11 @@ Seed は、Codex や DeepSeek Harness のようなエージェント実行環境
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-en-dark.gif">
-  <img src="docs/images/demo-en-light.gif" width="860" alt="デモ：Seed に「このアプリに会話履歴のサイドバーを追加して」と頼むと、AI が拡張機能を書き、その場でサイドバーが現れる">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-ja-dark.gif">
+  <img src="docs/images/demo-ja-light.gif" width="860" alt="デモ：Seed に「このアプリに会話履歴のサイドバーを追加して」と頼むと、AI が拡張機能を書き、その場でサイドバーが現れる">
 </picture>
 <br>
-<sub>「このアプリに会話履歴のサイドバーを追加して」と頼むと、AI が拡張機能を書き、その場でサイドバーが現れます。<br>実際のアプリを録画したものです。モデルの応答はあらかじめ用意したスクリプトです（画面は英語表示）。</sub>
+<sub>「このアプリに会話履歴のサイドバーを追加して」と頼むと、AI が拡張機能を書き、その場でサイドバーが現れます。<br>実際のアプリを録画したものです。モデルの応答はあらかじめ用意したスクリプトです。</sub>
 </div>
 
 ## 特長
@@ -83,8 +85,8 @@ DeepSeek、OpenAI、OpenRouter、Ollama のほか、OpenAI 互換のエンドポ
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-en-dark.png">
-  <img src="docs/images/chat-en-light.png" width="760" alt="コーディング作業の例：フォルダーの一覧、ファイルの読み取り、編集、コマンドの実行、そして要約">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-ja-dark.png">
+  <img src="docs/images/chat-ja-light.png" width="760" alt="コーディング作業の例：フォルダーの一覧、ファイルの読み取り、編集、コマンドの実行、そして要約">
 </picture>
 </div>
 
@@ -103,20 +105,20 @@ flowchart LR
 
 ## ダウンロードとインストール
 
-[Releases](https://github.com/HolyGr41L1337/Seed/releases/latest) ページの **Assets** で、お使いの環境に合ったファイル名をクリックするとダウンロードできます。
+下の表のファイル名をクリックすると、最新版をダウンロードできます（すべてのバージョンは [Releases](https://github.com/HolyGr41L1337/Seed/releases) ページにあります）。
 
 | OS | ファイル | 使い方 |
 | --- | --- | --- |
-| macOS（Apple シリコン：M1/M2/M3/M4…） | `Seed-<バージョン>-mac-arm64.dmg` | 開いて Seed を「アプリケーション」にドラッグ |
-| macOS（Intel） | `Seed-<バージョン>-mac-x64.dmg` | 同上 |
-| Windows（ほとんどの PC） | `Seed-Setup-<バージョン>-x64.exe` | ダブルクリックでインストール。完了すると自動で起動します。管理者権限は不要です |
-| Windows（インストール不要） | `Seed-<バージョン>-win-x64.zip` | 展開して `Seed.exe` をダブルクリック |
-| Windows（ARM 搭載 PC） | `Seed-Setup-<バージョン>-arm64.exe` | ダブルクリックでインストール |
-| Linux | `Seed-<バージョン>-linux-x86_64.AppImage` | 実行権限を付けてダブルクリック |
+| macOS（Apple シリコン：M1/M2/M3/M4…） | [`Seed-mac-arm64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg) | 開いて Seed を「アプリケーション」にドラッグ |
+| macOS（Intel） | [`Seed-mac-x64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg) | 同上 |
+| Windows（ほとんどの PC） | [`Seed-Setup-x64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe) | ダブルクリックでインストール。完了すると自動で起動します。管理者権限は不要です |
+| Windows（インストール不要） | [`Seed-win-x64.zip`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-win-x64.zip) | 展開して `Seed.exe` をダブルクリック |
+| Windows（ARM 搭載 PC） | [`Seed-Setup-arm64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-arm64.exe) | ダブルクリックでインストール |
+| Linux | [`Seed-linux-x86_64.AppImage`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage) | 実行権限を付けてダブルクリック |
 
 Mac のチップがわからないときは、アップルメニュー →「この Mac について」を開きます。「チップ」に Apple M… とあれば arm64、「プロセッサ」に Intel とあれば x64 です。
 
-起動すると、入力欄だけのウインドウと、その下にモデル API の接続カード（Connect a model API）が表示されます。プロバイダーを選び、API キーを入力して「Connect」を押せば使い始められます。
+起動すると、入力欄だけのウインドウと、その下に「モデル API に接続」のカードが表示されます。プロバイダーを選び、API キーを入力して「接続」を押せば使い始められます。画面の言語はシステムの言語に合わせて、中国語・英語・日本語・フランス語・ロシア語から自動で選ばれます。
 
 > [!IMPORTANT]
 > インストーラーには、Apple と Microsoft の有料の署名がまだありません。そのため、初回の起動時にシステムの警告が出ます。以下の操作を一度行えば、次からはふつうに開けます。
@@ -134,9 +136,9 @@ Mac のチップがわからないときは、アップルメニュー →「こ
 
 <br>
 
-- **File → Open Folder…**（`Cmd/Ctrl+O`）：AI がファイルを読み書きし、コマンドを実行するフォルダーです。既定はホームフォルダーなので、具体的なプロジェクトを選ぶことをおすすめします。
-- **File → Copy API Connection Info**：ローカルの API アドレスとアクセストークンをコピーします。ほかのプログラムから接続するときに使います（[API から利用する](#api-から利用する)を参照）。
-- **View → Safe Mode**：拡張機能が画面を壊してしまったときに、UI 拡張機能を読み込まないウインドウを開きます。
+- **ファイル → 作業フォルダーを選択…**（`Cmd/Ctrl+O`）：AI がファイルを読み書きし、コマンドを実行するフォルダーです。既定はホームフォルダーなので、具体的なプロジェクトを選ぶことをおすすめします。
+- **ファイル → API 接続情報をコピー**：ローカルの API アドレスとアクセストークンをコピーします。ほかのプログラムから接続するときに使います（[API から利用する](#api-から利用する)を参照）。
+- **表示 → セーフモード**：拡張機能が画面を壊してしまったときに、UI 拡張機能を読み込まないウインドウを開きます。
 
 デスクトップ版はシステムのプロキシ設定を自動的に使います（プロキシツールが有効にしたシステムプロキシなど）。OpenAI や Anthropic などのサービスに接続するための追加設定は不要です。macOS ではウインドウを閉じてもアプリはバックグラウンドで動き続け（API も引き続き使えます）、Dock のアイコンをクリックするとウインドウが開き直します。完全に終了するには `Cmd+Q` を押します。
 
@@ -155,7 +157,7 @@ Mac のチップがわからないときは、アップルメニュー →「こ
 | `OPENAI_API_KEY`（`OPENAI_BASE_URL` も指定可） | OpenAI |
 | `OPENROUTER_API_KEY` | OpenRouter |
 
-そのほかのプロバイダーは、接続カードで「Custom (OpenAI-compatible)」または「Custom (Anthropic-compatible)」を選び、ベース URL、キー、モデル名を入力します。
+そのほかのプロバイダーは、接続カードで「カスタム（OpenAI 互換）」または「カスタム（Anthropic 互換）」を選び、ベース URL、キー、モデル名を入力します。
 
 モデルを切り替えるには、`/model` と入力して一覧から選ぶか、`/model deepseek/deepseek-reasoner` のように指定します。
 
@@ -213,12 +215,12 @@ AI はまず [docs/EXTENDING.md](docs/EXTENDING.md) を読み、`~/.seed/extensi
 
 ## 承認モード
 
-影響のある操作をする前に、AI はあなたに確認します。カードには「Allow」（許可）、「Always allow this kind in this conversation」（この会話ではこの種類の操作を常に許可）、「Decline」（拒否）の 3 つの選択肢があります。
+影響のある操作をする前に、AI はあなたに確認します。カードには「許可」「この会話ではこの種類の操作を常に許可」「拒否」の 3 つの選択肢があります。
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/approval-en-dark.png">
-  <img src="docs/images/approval-en-light.png" width="760" alt="ファイルを変更する前に、変更内容を見せて確認する">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/approval-ja-dark.png">
+  <img src="docs/images/approval-ja-light.png" width="760" alt="ファイルを変更する前に、変更内容を見せて確認する">
 </picture>
 </div>
 
@@ -232,7 +234,7 @@ AI はまず [docs/EXTENDING.md](docs/EXTENDING.md) を読み、`~/.seed/extensi
 
 ## API から利用する
 
-アクセストークンは起動時に表示されます。`seed url` を実行すればいつでも確認できます。デスクトップ版ではメニューの File → Copy API Connection Info を使います。
+アクセストークンは起動時に表示されます。`seed url` を実行すればいつでも確認できます。デスクトップ版ではメニューの「ファイル → API 接続情報をコピー」を使います。
 
 **OpenAI のエンドポイントとして使う**（ベース URL は `http://127.0.0.1:7333/v1`、API キーはアクセストークン、モデルは `seed`）：
 
@@ -310,7 +312,6 @@ seed --safe                 # 拡張機能を読み込まずに起動
 - OS レベルのサンドボックスはありません（上記参照）。
 - MCP、Web 検索、画像アップロードの画面はまだ内蔵していません（API は画像コンテンツブロックに対応済みです）。いずれも AI に拡張機能として追加させることができます。
 - 自動テストとデスクトップアプリのスモークテストは Linux、macOS、Windows で実行しています（GitHub Actions）。ただし、実際の利用者の Mac や Windows PC で長期間使われた実績はまだありません。
-- アプリの表示言語は現在、中国語と英語のみです（システムの言語に応じて自動で選ばれます）。このページの画像は英語表示のものです。
 
 ## ドキュメントと開発
 
@@ -318,8 +319,8 @@ seed --safe                 # 拡張機能を読み込まずに起動
 | --- | --- |
 | [docs/EXTENDING.md](docs/EXTENDING.md) | 拡張機能のリファレンス（英語）。AI が機能を追加するときに読むのもこれです |
 | [docs/API.md](docs/API.md) | HTTP API リファレンス（英語） |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 各部分がどう連携するか、主要な設計がなぜそうなっているか（中国語） |
-| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | ソースからの実行、プロジェクト構成、テスト、リリース、インストーラーの署名（中国語） |
+| [docs/ARCHITECTURE.en.md](docs/ARCHITECTURE.en.md) | 各部分がどう連携するか、主要な設計がなぜそうなっているか（英語） |
+| [docs/DEVELOPMENT.en.md](docs/DEVELOPMENT.en.md) | ソースからの実行、プロジェクト構成、テスト、リリース、インストーラーの署名（英語） |
 
 ソースから実行するには Node.js 22 以降が必要です。
 

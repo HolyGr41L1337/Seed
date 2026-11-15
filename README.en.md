@@ -16,11 +16,13 @@
 </p>
 
 <p>
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-macos.svg" alt="Download for macOS" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg"><img src="docs/images/download-macos-arm64.svg" alt="Download for macOS (Apple silicon)" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-windows.svg" alt="Download for Windows" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg"><img src="docs/images/download-macos-x64.svg" alt="Download for macOS (Intel)" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-linux.svg" alt="Download for Linux" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe"><img src="docs/images/download-windows.svg" alt="Download for Windows" height="46"></a>
+&nbsp;
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage"><img src="docs/images/download-linux.svg" alt="Download for Linux" height="46"></a>
 </p>
 
 [Download](#download) · [Connect a model API](#connect-a-model-api) · [Let the AI add features](#let-the-ai-add-features) · [Use it through the API](#use-it-through-the-api) · [Docs](#docs-and-development)
@@ -103,20 +105,20 @@ flowchart LR
 
 ## Download
 
-On the [Releases](https://github.com/HolyGr41L1337/Seed/releases/latest) page, click the file for your system under **Assets**:
+Click a file name in the table to download the latest version (all versions are on the [Releases](https://github.com/HolyGr41L1337/Seed/releases) page):
 
 | System | File | How to install |
 | --- | --- | --- |
-| macOS (Apple silicon: M1/M2/M3/M4…) | `Seed-<version>-mac-arm64.dmg` | Open it and drag Seed into Applications |
-| macOS (Intel) | `Seed-<version>-mac-x64.dmg` | Same as above |
-| Windows (most PCs) | `Seed-Setup-<version>-x64.exe` | Double-click to install; it opens when done. No administrator rights needed |
-| Windows (no install) | `Seed-<version>-win-x64.zip` | Unzip and double-click `Seed.exe` |
-| Windows (ARM PCs) | `Seed-Setup-<version>-arm64.exe` | Double-click to install |
-| Linux | `Seed-<version>-linux-x86_64.AppImage` | Make it executable, then double-click |
+| macOS (Apple silicon: M1/M2/M3/M4…) | [`Seed-mac-arm64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg) | Open it and drag Seed into Applications |
+| macOS (Intel) | [`Seed-mac-x64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg) | Same as above |
+| Windows (most PCs) | [`Seed-Setup-x64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe) | Double-click to install; it opens when done. No administrator rights needed |
+| Windows (no install) | [`Seed-win-x64.zip`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-win-x64.zip) | Unzip and double-click `Seed.exe` |
+| Windows (ARM PCs) | [`Seed-Setup-arm64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-arm64.exe) | Double-click to install |
+| Linux | [`Seed-linux-x86_64.AppImage`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage) | Make it executable, then double-click |
 
 Not sure which chip your Mac has? Open the Apple menu → About This Mac. “Chip: Apple M…” means arm64; “Processor: Intel” means x64.
 
-The app opens as a window with just the input bar and a “Connect a model API” card below it: choose a provider, enter your API key, click Connect, and you are ready to go.
+The app opens as a window with just the input bar and a “Connect a model API” card below it: choose a provider, enter your API key, click Connect, and you are ready to go. The interface follows your system language: Chinese, English, Japanese, French or Russian.
 
 > [!IMPORTANT]
 > The installers are not yet signed with paid Apple and Microsoft certificates, so the system stops the first launch. Do the following once; after that the app opens normally.
@@ -310,7 +312,6 @@ The command-line version is installed from source; see [Docs and development](#d
 - No OS-level sandbox (see above).
 - MCP, web search and an image-upload interface are not built in yet (the API already accepts image content blocks). The AI can add all of these as extensions.
 - The automated tests and the desktop smoke test run on Linux, macOS and Windows (GitHub Actions), but the app has not yet seen long-term use on real people's Macs and Windows PCs.
-- The interface is available in Chinese and English, chosen from the system language.
 
 ## Docs and development
 
@@ -318,8 +319,8 @@ The command-line version is installed from source; see [Docs and development](#d
 | --- | --- |
 | [docs/EXTENDING.md](docs/EXTENDING.md) | Extension reference. This is what the AI reads when it adds a feature |
 | [docs/API.md](docs/API.md) | HTTP API reference |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the parts work together, and why the key designs are the way they are (in Chinese) |
-| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Running from source, project layout, tests, releasing, signing the installers (in Chinese) |
+| [docs/ARCHITECTURE.en.md](docs/ARCHITECTURE.en.md) | How the parts work together, and why the key designs are the way they are |
+| [docs/DEVELOPMENT.en.md](docs/DEVELOPMENT.en.md) | Running from source, project layout, tests, releasing, signing the installers |
 
 Running from source needs Node.js 22 or later:
 

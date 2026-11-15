@@ -1,5 +1,7 @@
 # 开发与发布
 
+**中文** · [English](DEVELOPMENT.en.md)
+
 这份文档写给想改 Seed 本身、或者要发布新版本的人。只是使用的话，看 [README](../README.md) 就够了。
 
 ## 从源码运行
@@ -54,7 +56,7 @@ src/
   extensions/host.js   扩展加载、热重载、错误收集
   server/              HTTP 服务、REST API、OpenAI 兼容端点、鉴权
 web/                   界面（原生 JavaScript，无构建步骤）
-docs/                  API.md、EXTENDING.md、ARCHITECTURE.md、DEVELOPMENT.md
+docs/                  API.md、EXTENDING.md、ARCHITECTURE.md、DEVELOPMENT.md（后两份另有英文版 *.en.md）
 examples/extensions/   示例扩展
 scripts/               生成 README 配图、生成发布说明的脚本
 test/                  自动化测试
@@ -65,7 +67,7 @@ test/                  自动化测试
 ## 测试
 
 ```bash
-npm test                 # 工具、审批策略、智能体循环、两种模型接口、HTTP API、扩展系统
+npm test                 # 工具、审批策略、智能体循环、两种模型接口、HTTP API、扩展系统、界面文字
 node test/e2e/ui.mjs     # 浏览器端到端测试（需要另装 Playwright）
 node test/e2e/desktop.mjs   # 桌面应用冒烟测试（需要 Playwright；加 --app <路径> 测试打包好的应用）
 ```
@@ -99,6 +101,8 @@ npm run dist:mac
 
 （Windows 上用 `npm run dist:win`，Linux 上用 `npm run dist:linux`，产物在 `dist/` 里。）
 
+**文件名。** 安装包的文件名不带版本号（例如 `Seed-mac-arm64.dmg`）。这样 `https://github.com/<owner>/<repo>/releases/latest/download/<文件名>` 永远指向最新版，README 里的下载按钮和表格用的就是这种地址。要改文件名的话，`electron-builder.config.cjs`、`scripts/release-notes.sh` 和五个 README 得一起改。
+
 **谁能下载。** 仓库是私有的时候，Releases 里的文件也只有对仓库有权限的人能下载。要让任何人都能下载，可以把仓库改为公开，或者另建一个公开仓库专门放安装包。
 
 ### 给安装包签名
@@ -111,6 +115,12 @@ npm run dist:mac
 | `APPLE_ID` / `APPLE_APP_SPECIFIC_PASSWORD` / `APPLE_TEAM_ID` | Apple ID、App 专用密码、团队 ID | macOS 公证，之后双击即可打开 |
 | `WIN_CERT_PFX_BASE64` / `WIN_CERT_PASSWORD` | Windows 代码签名证书（.pfx，base64 编码）及其密码 | Windows 签名 |
 
+## 界面语言
+
+界面有中文、英文、日语、法语、俄语五种，按系统语言自动选择。文字都在 `web/assets/js/i18n.js` 里，每种语言一张表；`test/i18n.test.js` 会检查五张表的条目是否一致。桌面版的菜单文字在 `desktop/main.js` 里。
+
+加一种语言：在 `i18n.js` 里加一张表并登记到 `languages`，再给 `desktop/main.js` 里的菜单文字补上对应的一项。扩展里的文字用 `seed.tr('中文', 'English', { ja, fr, ru })`，没有对应语言时显示英文。
+
 ## README 和配图
 
 README 有五种语言：`README.md`（中文）、`README.en.md`、`README.ja.md`、`README.fr.md`、`README.ru.md`。改内容时五个文件要一起改。
@@ -121,4 +131,4 @@ README 里的演示动图、截图、徽章和下载按钮都由一个脚本生�
 node scripts/readme-media.mjs
 ```
 
-需要 Playwright（带 Chromium）和 ffmpeg。图片输出到 `docs/images/`，中文界面和英文界面、浅色和深色各一套；日语、法语、俄语的 README 用英文界面的图。动图里的应用是真实的，模型是脚本化的替身，“写出来”的侧边栏就是 `examples/extensions/history-sidebar`。
+需要 Playwright（带 Chromium）和 ffmpeg。需要的字体是 Inter 和 Noto Sans CJK（Ubuntu 上是 `fonts-inter`、`fonts-noto-cjk`）。图片输出到 `docs/images/`，五种界面语言、浅色和深色各一套。动图里的应用是真实的，模型是脚本化的替身，“写出来”的侧边栏就是 `examples/extensions/history-sidebar`。

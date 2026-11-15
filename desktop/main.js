@@ -10,8 +10,10 @@ import { App } from '../src/app.js';
 import { APP_DIR, VERSION } from '../src/util.js';
 
 const IS_MAC = process.platform === 'darwin';
-const zh = () => /^zh/i.test(electron.getLocale() || '');
-const tr = (chinese, english) => (zh() ? chinese : english);
+// Menu and dialog text follows the system language: Chinese, English, Japanese,
+// French or Russian; any other language gets English.
+const language = () => String(electron.getLocale() || '').slice(0, 2).toLowerCase();
+const tr = (chinese, english, others) => (language() === 'zh' ? chinese : others?.[language()] ?? english);
 
 let seed = null; // the Seed app
 let address = null; // { url, urlWithToken, port }
@@ -113,7 +115,7 @@ function createWindow() {
 
 async function pickFolder(defaultPath) {
   const { canceled, filePaths } = await dialog.showOpenDialog(win, {
-    title: tr('选择工作目录', 'Choose the workspace folder'),
+    title: tr('选择工作目录', 'Choose the workspace folder', { ja: '作業フォルダーを選択', fr: 'Choisir le dossier de travail', ru: 'Выберите рабочую папку' }),
     defaultPath: defaultPath || seed.cwd,
     properties: ['openDirectory', 'createDirectory'],
   });
@@ -132,7 +134,11 @@ async function openFolder() {
   const filePaths = [folder];
   await seed.config.update({ workspace: filePaths[0] });
   await runInPage(`location.hash = '#/'`);
-  toast(tr(`新对话将在 ${filePaths[0]} 中进行`, `New conversations will work in ${filePaths[0]}`));
+  toast(tr(`新对话将在 ${filePaths[0]} 中进行`, `New conversations will work in ${filePaths[0]}`, {
+      ja: `新しい会話は ${filePaths[0]} で作業します`,
+      fr: `Les nouvelles conversations travailleront dans ${filePaths[0]}`,
+      ru: `Новые диалоги будут работать в ${filePaths[0]}`,
+    }));
 }
 
 function copyApiInfo() {
@@ -145,49 +151,49 @@ function copyApiInfo() {
       `Model: seed`,
     ].join('\n'),
   );
-  toast(tr('已复制 API 地址和访问令牌', 'Copied the API address and access token'));
+  toast(tr('已复制 API 地址和访问令牌', 'Copied the API address and access token', { ja: 'API アドレスとアクセストークンをコピーしました', fr: "Adresse de l'API et jeton d'accès copiés", ru: 'Адрес API и токен доступа скопированы' }));
 }
 
 function buildMenu() {
   const template = [
     ...(IS_MAC ? [{ role: 'appMenu' }] : []),
     {
-      label: tr('文件', 'File'),
+      label: tr('文件', 'File', { ja: 'ファイル', fr: 'Fichier', ru: 'Файл' }),
       submenu: [
-        { label: tr('新对话', 'New Conversation'), accelerator: 'CmdOrCtrl+N', click: () => runInPage(`location.hash = '#/'`) },
-        { label: tr('选择工作目录…', 'Open Folder…'), accelerator: 'CmdOrCtrl+O', click: () => openFolder() },
+        { label: tr('新对话', 'New Conversation', { ja: '新しい会話', fr: 'Nouvelle conversation', ru: 'Новый диалог' }), accelerator: 'CmdOrCtrl+N', click: () => runInPage(`location.hash = '#/'`) },
+        { label: tr('选择工作目录…', 'Open Folder…', { ja: '作業フォルダーを選択…', fr: 'Ouvrir un dossier…', ru: 'Открыть папку…' }), accelerator: 'CmdOrCtrl+O', click: () => openFolder() },
         { type: 'separator' },
-        { label: tr('复制 API 接入信息', 'Copy API Connection Info'), click: copyApiInfo },
-        { label: tr('打开数据文件夹', 'Open Data Folder'), click: () => shell.openPath(seed.home) },
+        { label: tr('复制 API 接入信息', 'Copy API Connection Info', { ja: 'API 接続情報をコピー', fr: "Copier les informations de connexion à l'API", ru: 'Скопировать данные для подключения к API' }), click: copyApiInfo },
+        { label: tr('打开数据文件夹', 'Open Data Folder', { ja: 'データフォルダーを開く', fr: 'Ouvrir le dossier des données', ru: 'Открыть папку с данными' }), click: () => shell.openPath(seed.home) },
         { type: 'separator' },
-        IS_MAC ? { role: 'close' } : { role: 'quit', label: tr('退出', 'Quit') },
+        IS_MAC ? { role: 'close' } : { role: 'quit', label: tr('退出', 'Quit', { ja: '終了', fr: 'Quitter', ru: 'Выйти' }) },
       ],
     },
-    { role: 'editMenu', label: tr('编辑', 'Edit') },
+    { role: 'editMenu', label: tr('编辑', 'Edit', { ja: '編集', fr: 'Édition', ru: 'Правка' }) },
     {
-      label: tr('视图', 'View'),
+      label: tr('视图', 'View', { ja: '表示', fr: 'Affichage', ru: 'Вид' }),
       submenu: [
-        { role: 'reload', label: tr('重新载入', 'Reload') },
+        { role: 'reload', label: tr('重新载入', 'Reload', { ja: '再読み込み', fr: 'Recharger', ru: 'Перезагрузить' }) },
         {
-          label: tr('安全模式（不加载界面扩展）', 'Safe Mode (no UI extensions)'),
+          label: tr('安全模式（不加载界面扩展）', 'Safe Mode (no UI extensions)', { ja: 'セーフモード（UI 拡張機能を読み込まない）', fr: "Mode sans échec (sans extensions d'interface)", ru: 'Безопасный режим (без расширений интерфейса)' }),
           click: () => win?.loadURL(`${address.url}/?safe=1`),
         },
-        { role: 'toggleDevTools', label: tr('开发者工具', 'Developer Tools') },
+        { role: 'toggleDevTools', label: tr('开发者工具', 'Developer Tools', { ja: '開発者ツール', fr: 'Outils de développement', ru: 'Инструменты разработчика' }) },
         { type: 'separator' },
-        { role: 'resetZoom', label: tr('实际大小', 'Actual Size') },
-        { role: 'zoomIn', label: tr('放大', 'Zoom In') },
-        { role: 'zoomOut', label: tr('缩小', 'Zoom Out') },
+        { role: 'resetZoom', label: tr('实际大小', 'Actual Size', { ja: '実際のサイズ', fr: 'Taille réelle', ru: 'Реальный размер' }) },
+        { role: 'zoomIn', label: tr('放大', 'Zoom In', { ja: '拡大', fr: 'Zoom avant', ru: 'Увеличить' }) },
+        { role: 'zoomOut', label: tr('缩小', 'Zoom Out', { ja: '縮小', fr: 'Zoom arrière', ru: 'Уменьшить' }) },
         { type: 'separator' },
-        { role: 'togglefullscreen', label: tr('全屏', 'Full Screen') },
+        { role: 'togglefullscreen', label: tr('全屏', 'Full Screen', { ja: 'フルスクリーン', fr: 'Plein écran', ru: 'Полноэкранный режим' }) },
       ],
     },
     ...(IS_MAC ? [{ role: 'windowMenu' }] : []),
     {
       role: 'help',
-      label: tr('帮助', 'Help'),
+      label: tr('帮助', 'Help', { ja: 'ヘルプ', fr: 'Aide', ru: 'Справка' }),
       submenu: [
-        { label: tr('打开说明文档文件夹', 'Open the Documentation Folder'), click: () => shell.openPath(path.join(APP_DIR, 'docs')) },
-        { label: tr('打开示例扩展文件夹', 'Open the Example Extensions Folder'), click: () => shell.openPath(path.join(APP_DIR, 'examples', 'extensions')) },
+        { label: tr('打开说明文档文件夹', 'Open the Documentation Folder', { ja: 'ドキュメントのフォルダーを開く', fr: 'Ouvrir le dossier de la documentation', ru: 'Открыть папку с документацией' }), click: () => shell.openPath(path.join(APP_DIR, 'docs')) },
+        { label: tr('打开示例扩展文件夹', 'Open the Example Extensions Folder', { ja: 'サンプル拡張機能のフォルダーを開く', fr: "Ouvrir le dossier des exemples d'extensions", ru: 'Открыть папку с примерами расширений' }), click: () => shell.openPath(path.join(APP_DIR, 'examples', 'extensions')) },
       ],
     },
   ];
@@ -211,7 +217,7 @@ async function main() {
   try {
     await startServer();
   } catch (err) {
-    dialog.showErrorBox(tr('Seed 无法启动', 'Seed could not start'), String(err?.stack || err));
+    dialog.showErrorBox(tr('Seed 无法启动', 'Seed could not start', { ja: 'Seed を起動できませんでした', fr: "Seed n'a pas pu démarrer", ru: 'Не удалось запустить Seed' }), String(err?.stack || err));
     electron.exit(1);
     return;
   }

@@ -16,11 +16,13 @@
 </p>
 
 <p>
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-macos.svg" alt="下载 macOS 版" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg"><img src="docs/images/download-macos-arm64.svg" alt="下载 macOS 版（Apple 芯片）" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-windows.svg" alt="下载 Windows 版" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg"><img src="docs/images/download-macos-x64.svg" alt="下载 macOS 版（Intel 芯片）" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-linux.svg" alt="下载 Linux 版" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe"><img src="docs/images/download-windows.svg" alt="下载 Windows 版" height="46"></a>
+&nbsp;
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage"><img src="docs/images/download-linux.svg" alt="下载 Linux 版" height="46"></a>
 </p>
 
 [下载安装](#下载安装) · [连接模型 API](#连接模型-api) · [让 AI 给软件加功能](#让-ai-给软件加功能) · [通过 API 接入](#通过-api-接入) · [文档](#文档与开发)
@@ -103,20 +105,20 @@ flowchart LR
 
 ## 下载安装
 
-到 [Releases](https://github.com/HolyGr41L1337/Seed/releases/latest) 页面，在 **Assets** 里点对应的文件名即可下载：
+点下面表格里的文件名，直接下载最新版（所有版本见 [Releases](https://github.com/HolyGr41L1337/Seed/releases) 页面）：
 
 | 系统 | 下载 | 用法 |
 | --- | --- | --- |
-| macOS（Apple 芯片：M1/M2/M3/M4…） | `Seed-<版本>-mac-arm64.dmg` | 打开后把 Seed 拖进“应用程序” |
-| macOS（Intel 芯片） | `Seed-<版本>-mac-x64.dmg` | 同上 |
-| Windows（绝大多数电脑） | `Seed-Setup-<版本>-x64.exe` | 双击安装，装完自动打开，不需要管理员权限 |
-| Windows（免安装） | `Seed-<版本>-win-x64.zip` | 解压后双击 `Seed.exe` |
-| Windows（ARM 电脑） | `Seed-Setup-<版本>-arm64.exe` | 双击安装 |
-| Linux | `Seed-<版本>-linux-x86_64.AppImage` | 加上执行权限后双击 |
+| macOS（Apple 芯片：M1/M2/M3/M4…） | [`Seed-mac-arm64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg) | 打开后把 Seed 拖进“应用程序” |
+| macOS（Intel 芯片） | [`Seed-mac-x64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg) | 同上 |
+| Windows（绝大多数电脑） | [`Seed-Setup-x64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe) | 双击安装，装完自动打开，不需要管理员权限 |
+| Windows（免安装） | [`Seed-win-x64.zip`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-win-x64.zip) | 解压后双击 `Seed.exe` |
+| Windows（ARM 电脑） | [`Seed-Setup-arm64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-arm64.exe) | 双击安装 |
+| Linux | [`Seed-linux-x86_64.AppImage`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage) | 加上执行权限后双击 |
 
 不知道 Mac 是哪种芯片：点左上角苹果菜单 →“关于本机”，“芯片”一栏写着 Apple M… 的选 arm64，写着 Intel 的选 x64。
 
-打开后是一个只有输入栏的窗口，下方有“连接模型 API”的卡片：选服务商，填 API Key，点连接，就可以开始用了。
+打开后是一个只有输入栏的窗口，下方有“连接模型 API”的卡片：选服务商，填 API Key，点连接，就可以开始用了。界面语言跟随系统，支持中文、英文、日语、法语、俄语。
 
 > [!IMPORTANT]
 > 安装包目前没有经过苹果和微软的付费签名，第一次打开时系统会拦一下。按下面操作一次即可，以后正常打开。
@@ -310,7 +312,6 @@ seed --safe                 # 不加载扩展启动
 - 没有系统级沙箱（见上）。
 - 还没有内置 MCP、网页搜索、图片上传界面（API 已支持图片内容块）。这些都可以让 AI 以扩展的形式加上。
 - 自动化测试和桌面应用冒烟测试在 Linux、macOS、Windows 上运行（GitHub Actions），但还没有在真人使用的 Mac 和 Windows 电脑上长期使用过。
-- 界面目前有中文和英文两种语言，按系统语言自动选择。
 
 ## 文档与开发
 
@@ -318,8 +319,8 @@ seed --safe                 # 不加载扩展启动
 | --- | --- |
 | [docs/EXTENDING.md](docs/EXTENDING.md) | 扩展开发参考（英文）。AI 给软件加功能时读的就是它 |
 | [docs/API.md](docs/API.md) | HTTP API 参考（英文） |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 各部分怎么配合，关键设计为什么这样做 |
-| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | 从源码运行、项目结构、测试、发布新版本、给安装包签名 |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 各部分怎么配合，关键设计为什么这样做（另有[英文版](docs/ARCHITECTURE.en.md)） |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | 从源码运行、项目结构、测试、发布新版本、给安装包签名（另有[英文版](docs/DEVELOPMENT.en.md)） |
 
 从源码运行需要 Node.js 22 或更高版本：
 

@@ -16,11 +16,13 @@
 </p>
 
 <p>
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-macos.svg" alt="Скачать для macOS" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg"><img src="docs/images/download-macos-arm64.svg" alt="Скачать для macOS (чип Apple)" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-windows.svg" alt="Скачать для Windows" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg"><img src="docs/images/download-macos-x64.svg" alt="Скачать для macOS (Intel)" height="46"></a>
 &nbsp;
-<a href="https://github.com/HolyGr41L1337/Seed/releases/latest"><img src="docs/images/download-linux.svg" alt="Скачать для Linux" height="46"></a>
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe"><img src="docs/images/download-windows.svg" alt="Скачать для Windows" height="46"></a>
+&nbsp;
+<a href="https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage"><img src="docs/images/download-linux.svg" alt="Скачать для Linux" height="46"></a>
 </p>
 
 [Скачать](#скачать-и-установить) · [Подключение API модели](#подключение-api-модели) · [Пусть ИИ добавляет функции](#пусть-ии-добавляет-функции) · [Работа через API](#работа-через-api) · [Документация](#документация-и-разработка)
@@ -35,11 +37,11 @@ Seed — это среда для запуска ИИ-агента (harness) в 
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-en-dark.gif">
-  <img src="docs/images/demo-en-light.gif" width="860" alt="Демонстрация: Seed получает просьбу «Добавь в это приложение боковую панель с историей диалогов», ИИ пишет расширение, и панель сразу появляется">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-ru-dark.gif">
+  <img src="docs/images/demo-ru-light.gif" width="860" alt="Демонстрация: Seed получает просьбу «Добавь в это приложение боковую панель с историей диалогов», ИИ пишет расширение, и панель сразу появляется">
 </picture>
 <br>
-<sub>Скажите ему «Добавь в это приложение боковую панель с историей диалогов» — ИИ напишет расширение, и панель сразу появится.<br>Записано в настоящем приложении; ответы модели заданы сценарием (интерфейс показан на английском).</sub>
+<sub>Скажите ему «Добавь в это приложение боковую панель с историей диалогов» — ИИ напишет расширение, и панель сразу появится.<br>Записано в настоящем приложении; ответы модели заданы сценарием.</sub>
 </div>
 
 ## Возможности
@@ -83,8 +85,8 @@ DeepSeek, OpenAI, OpenRouter, Ollama и любой OpenAI-совместимый
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-en-dark.png">
-  <img src="docs/images/chat-en-light.png" width="760" alt="Задача по программированию: список папки, чтение файла, правка, запуск команды и итог">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-ru-dark.png">
+  <img src="docs/images/chat-ru-light.png" width="760" alt="Задача по программированию: список папки, чтение файла, правка, запуск команды и итог">
 </picture>
 </div>
 
@@ -103,20 +105,20 @@ flowchart LR
 
 ## Скачать и установить
 
-На странице [Releases](https://github.com/HolyGr41L1337/Seed/releases/latest) в разделе **Assets** нажмите на файл для своей системы:
+Нажмите на имя файла в таблице, чтобы скачать последнюю версию (все версии есть на странице [Releases](https://github.com/HolyGr41L1337/Seed/releases)):
 
 | Система | Файл | Как установить |
 | --- | --- | --- |
-| macOS (чип Apple: M1/M2/M3/M4…) | `Seed-<версия>-mac-arm64.dmg` | Откройте и перетащите Seed в «Программы» |
-| macOS (Intel) | `Seed-<версия>-mac-x64.dmg` | Так же |
-| Windows (большинство компьютеров) | `Seed-Setup-<версия>-x64.exe` | Запустите двойным щелчком; после установки приложение откроется само. Права администратора не нужны |
-| Windows (без установки) | `Seed-<версия>-win-x64.zip` | Распакуйте и дважды щёлкните `Seed.exe` |
-| Windows (компьютеры на ARM) | `Seed-Setup-<версия>-arm64.exe` | Запустите двойным щелчком |
-| Linux | `Seed-<версия>-linux-x86_64.AppImage` | Сделайте файл исполняемым и запустите двойным щелчком |
+| macOS (чип Apple: M1/M2/M3/M4…) | [`Seed-mac-arm64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-arm64.dmg) | Откройте и перетащите Seed в «Программы» |
+| macOS (Intel) | [`Seed-mac-x64.dmg`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-mac-x64.dmg) | Так же |
+| Windows (большинство компьютеров) | [`Seed-Setup-x64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-x64.exe) | Запустите двойным щелчком; после установки приложение откроется само. Права администратора не нужны |
+| Windows (без установки) | [`Seed-win-x64.zip`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-win-x64.zip) | Распакуйте и дважды щёлкните `Seed.exe` |
+| Windows (компьютеры на ARM) | [`Seed-Setup-arm64.exe`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-Setup-arm64.exe) | Запустите двойным щелчком |
+| Linux | [`Seed-linux-x86_64.AppImage`](https://github.com/HolyGr41L1337/Seed/releases/latest/download/Seed-linux-x86_64.AppImage) | Сделайте файл исполняемым и запустите двойным щелчком |
 
 Не знаете, какой чип в вашем Mac? Откройте меню Apple → «Об этом Mac». «Чип: Apple M…» — это arm64, «Процессор: Intel» — x64.
 
-Приложение открывается окном, в котором есть только строка ввода, а под ней карточка «Connect a model API»: выберите провайдера, введите ключ API, нажмите «Connect» — и можно работать.
+Приложение открывается окном, в котором есть только строка ввода, а под ней карточка «Подключить API модели»: выберите провайдера, введите ключ API, нажмите «Подключить» — и можно работать. Язык интерфейса выбирается по языку системы: китайский, английский, японский, французский или русский.
 
 > [!IMPORTANT]
 > Установщики пока не подписаны платными сертификатами Apple и Microsoft, поэтому при первом запуске система их блокирует. Один раз выполните действия ниже, и дальше приложение будет открываться как обычно.
@@ -134,9 +136,9 @@ flowchart LR
 
 <br>
 
-- **File → Open Folder…** (`Cmd/Ctrl+O`): папка, в которой ИИ читает и записывает файлы и выполняет команды. По умолчанию это ваша домашняя папка; лучше выбрать конкретный проект.
-- **File → Copy API Connection Info**: копирует локальный адрес API и токен доступа, чтобы подключать другие программы (см. [Работа через API](#работа-через-api)).
-- **View → Safe Mode**: если какое-то расширение сломало интерфейс, открывает окно без расширений интерфейса.
+- **Файл → Открыть папку…** (`Cmd/Ctrl+O`): папка, в которой ИИ читает и записывает файлы и выполняет команды. По умолчанию это ваша домашняя папка; лучше выбрать конкретный проект.
+- **Файл → Скопировать данные для подключения к API**: копирует локальный адрес API и токен доступа, чтобы подключать другие программы (см. [Работа через API](#работа-через-api)).
+- **Вид → Безопасный режим**: если какое-то расширение сломало интерфейс, открывает окно без расширений интерфейса.
 
 Настольное приложение автоматически использует системные настройки прокси (например, системный прокси, включённый прокси-клиентом), поэтому для доступа к OpenAI, Anthropic и другим сервисам ничего дополнительно настраивать не нужно. В macOS приложение продолжает работать после закрытия окна (API остаётся доступным); нажмите на значок в Dock, чтобы снова открыть окно, а полностью выйти можно через `Cmd+Q`.
 
@@ -155,7 +157,7 @@ flowchart LR
 | `OPENAI_API_KEY` (можно добавить `OPENAI_BASE_URL`) | OpenAI |
 | `OPENROUTER_API_KEY` | OpenRouter |
 
-Для других провайдеров выберите в карточке подключения «Custom (OpenAI-compatible)» или «Custom (Anthropic-compatible)» и укажите базовый URL, ключ и название модели.
+Для других провайдеров выберите в карточке подключения «Свой (совместимый с OpenAI)» или «Свой (совместимый с Anthropic)» и укажите базовый URL, ключ и название модели.
 
 Чтобы сменить модель, введите `/model` и выберите из списка либо введите `/model deepseek/deepseek-reasoner`.
 
@@ -213,12 +215,12 @@ flowchart LR
 
 ## Режимы подтверждения
 
-Прежде чем сделать что-то с последствиями, ИИ спрашивает вас. На карточке три варианта: «Allow» (разрешить), «Always allow this kind in this conversation» (всегда разрешать такие действия в этом диалоге) и «Decline» (отклонить).
+Прежде чем сделать что-то с последствиями, ИИ спрашивает вас. На карточке три варианта: «Разрешить», «Всегда разрешать такие действия в этом диалоге» и «Отклонить».
 
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/approval-en-dark.png">
-  <img src="docs/images/approval-en-light.png" width="760" alt="Перед изменением файла Seed показывает, что именно изменится">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/approval-ru-dark.png">
+  <img src="docs/images/approval-ru-light.png" width="760" alt="Перед изменением файла Seed показывает, что именно изменится">
 </picture>
 </div>
 
@@ -232,7 +234,7 @@ flowchart LR
 
 ## Работа через API
 
-Токен доступа выводится при запуске; посмотреть его снова можно командой `seed url`. В настольном приложении используйте меню File → Copy API Connection Info.
+Токен доступа выводится при запуске; посмотреть его снова можно командой `seed url`. В настольном приложении используйте меню Файл → Скопировать данные для подключения к API.
 
 **Как OpenAI-совместимый интерфейс** (базовый URL `http://127.0.0.1:7333/v1`, ключ API — токен доступа, модель `seed`):
 
@@ -310,7 +312,6 @@ seed --safe                 # запуск без расширений
 - Нет песочницы на уровне системы (см. выше).
 - MCP, веб-поиск и интерфейс загрузки изображений пока не встроены (API уже принимает блоки с изображениями). Всё это ИИ может добавить в виде расширений.
 - Автоматические тесты и смоук-тест настольного приложения выполняются в Linux, macOS и Windows (GitHub Actions), но приложением ещё не пользовались подолгу на компьютерах Mac и Windows обычных пользователей.
-- Интерфейс пока доступен на китайском и английском языках и выбирается по языку системы. Изображения на этой странице показывают английский интерфейс.
 
 ## Документация и разработка
 
@@ -318,8 +319,8 @@ seed --safe                 # запуск без расширений
 | --- | --- |
 | [docs/EXTENDING.md](docs/EXTENDING.md) | Справочник по расширениям (на английском). Именно его читает ИИ, когда добавляет функцию |
 | [docs/API.md](docs/API.md) | Справочник по HTTP API (на английском) |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Как части работают вместе и почему ключевые решения устроены именно так (на китайском) |
-| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Запуск из исходного кода, структура проекта, тесты, выпуск версий, подпись установщиков (на китайском) |
+| [docs/ARCHITECTURE.en.md](docs/ARCHITECTURE.en.md) | Как части работают вместе и почему ключевые решения устроены именно так (на английском) |
+| [docs/DEVELOPMENT.en.md](docs/DEVELOPMENT.en.md) | Запуск из исходного кода, структура проекта, тесты, выпуск версий, подпись установщиков (на английском) |
 
 Для запуска из исходного кода нужен Node.js 22 или новее:
 

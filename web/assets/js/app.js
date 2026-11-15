@@ -614,7 +614,7 @@ async function signIn(token) {
 }
 
 async function boot() {
-  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
   // In the desktop app: room for the macOS window buttons, and the native folder picker.
   if (window.seedDesktop) document.documentElement.classList.add('desktop', `desktop-${window.seedDesktop.platform}`);
   const url = new URL(location.href);

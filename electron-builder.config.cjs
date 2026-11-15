@@ -22,6 +22,7 @@ module.exports = {
     'src/**',
     'web/**',
     'docs/**',
+    '!docs/images/**', // README pictures, not needed inside the app
     'examples/**',
     'build/icon-win.png',
     'README.md',
@@ -29,7 +30,10 @@ module.exports = {
   // Keep the app's files as plain files: the agent reads the docs and the
   // example extensions with ordinary file tools and shell commands.
   asar: false,
-  artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
+  // File names carry no version, so that
+  // https://github.com/<owner>/<repo>/releases/latest/download/<name> always
+  // points at the newest build. The READMEs' download buttons rely on this.
+  artifactName: '${productName}-${os}-${arch}.${ext}',
   publish: null,
 
   mac: {
@@ -45,7 +49,7 @@ module.exports = {
     entitlementsInherit: 'build/entitlements.mac.plist',
   },
   dmg: {
-    artifactName: '${productName}-${version}-mac-${arch}.${ext}',
+    artifactName: '${productName}-mac-${arch}.${ext}',
     title: '${productName} ${version}',
   },
 
@@ -60,7 +64,7 @@ module.exports = {
     oneClick: true,
     perMachine: false, // installs for the current user: no administrator rights needed
     buildUniversalInstaller: false, // one installer per architecture, not one with both inside
-    artifactName: '${productName}-Setup-${version}-${arch}.${ext}',
+    artifactName: '${productName}-Setup-${arch}.${ext}',
     shortcutName: 'Seed',
     createDesktopShortcut: true,
     createStartMenuShortcut: true,

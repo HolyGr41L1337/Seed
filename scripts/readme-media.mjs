@@ -1,14 +1,16 @@
 // Makes the pictures the READMEs use: a short demo animation and two
-// screenshots, for the Chinese and the English interface, light and dark, plus
-// the badges and download buttons.
+// screenshots for each interface language (Chinese, English, Japanese, French,
+// Russian), light and dark, plus the badges and download buttons.
 //
 //   node scripts/readme-media.mjs                 everything
 //   node scripts/readme-media.mjs --only en-dark  one language and theme
 //   node scripts/readme-media.mjs --only badges   only the badges and buttons
 //
-// Needs Playwright with Chromium, and ffmpeg for the animation. The app in the
-// pictures is the real one; the model is a scripted stand-in that streams at a
-// readable pace, and the sidebar it "writes" is examples/extensions/history-sidebar.
+// Needs Playwright with Chromium, ffmpeg for the animation, and the fonts Inter
+// and Noto Sans CJK (on Ubuntu: fonts-inter, fonts-noto-cjk), so that the
+// pictures look the same whichever machine makes them. The app in the pictures
+// is the real one; the model is a scripted stand-in that streams at a readable
+// pace, and the sidebar it "writes" is examples/extensions/history-sidebar.
 import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -32,6 +34,8 @@ const TEXT = {
   zh: {
     locale: 'zh-CN',
     chars: 2,
+    typing: 95,
+    cjk: 'Noto Sans CJK SC',
     grow: '给这个软件加一个历史对话侧边栏',
     reasoning: '用户想给软件本身加功能，应该写成扩展。先读扩展文档。',
     readDocs: '我先看一下扩展开发文档。',
@@ -60,6 +64,8 @@ hello, seed
   en: {
     locale: 'en-US',
     chars: 5,
+    typing: 42,
+    cjk: 'Noto Sans CJK SC',
     grow: 'Add a conversation history sidebar to this app',
     reasoning: 'The user wants a new feature in the app itself, so it should be an extension. Read the extension guide first.',
     readDocs: 'Let me read the extension guide first.',
@@ -79,6 +85,96 @@ hello, seed
 | index.js | 1 |
 
 I changed the greeting to \`hello, seed\`. The result:
+
+\`\`\`bash
+$ node index.js
+hello, seed
+\`\`\``,
+  },
+  ja: {
+    locale: 'ja-JP',
+    chars: 2,
+    typing: 95,
+    cjk: 'Noto Sans CJK JP',
+    grow: 'このアプリに会話履歴のサイドバーを追加して',
+    reasoning: 'アプリ自体に機能を追加したいという依頼なので、拡張機能として書くべきだ。まず拡張機能のガイドを読もう。',
+    readDocs: 'まず拡張機能のガイドを読みます。',
+    write: 'サイドバーを拡張機能として書きます：',
+    grown: 'サイドバーを追加しました。左側にこれまでの会話が並びます。クリックで切り替え、マウスを重ねると削除できます。`/history` で表示・非表示を切り替えられます。',
+    task: 'このプロジェクトを見て、あいさつ文を hello, seed に変えて実行して',
+    look: 'まずフォルダーを見てみます。',
+    run: 'エントリーファイルを実行',
+    answer: `とても小さな **Node.js** プロジェクトです：
+
+- \`README.md\`：プロジェクトの説明
+- \`index.js\`：エントリーファイル。出力は 1 行だけ
+
+| ファイル | 行数 |
+| --- | ---: |
+| README.md | 1 |
+| index.js | 1 |
+
+あいさつ文を \`hello, seed\` に変更しました。実行結果：
+
+\`\`\`bash
+$ node index.js
+hello, seed
+\`\`\``,
+  },
+  fr: {
+    locale: 'fr-FR',
+    chars: 5,
+    typing: 42,
+    cjk: 'Noto Sans CJK SC',
+    grow: "Ajoute une barre latérale d'historique des conversations à cette application",
+    reasoning: "L'utilisateur veut une nouvelle fonctionnalité dans l'application elle-même : il faut en faire une extension. Lisons d'abord le guide des extensions.",
+    readDocs: 'Je commence par lire le guide des extensions.',
+    write: "J'écris la barre latérale sous forme d'extension :",
+    grown: "La barre latérale est en place. Elle liste vos conversations passées à gauche : cliquez pour changer de conversation, survolez pour supprimer. Tapez `/history` pour l'afficher ou la masquer.",
+    task: 'Regarde ce projet, remplace le message par hello, seed et lance-le',
+    look: "Je regarde d'abord le dossier.",
+    run: "Lancer le fichier d'entrée",
+    answer: `C'est un tout petit projet **Node.js** :
+
+- \`README.md\` : la description
+- \`index.js\` : le fichier d'entrée, une seule ligne de sortie
+
+| Fichier | Lignes |
+| --- | ---: |
+| README.md | 1 |
+| index.js | 1 |
+
+J'ai remplacé le message par \`hello, seed\`. Le résultat :
+
+\`\`\`bash
+$ node index.js
+hello, seed
+\`\`\``,
+  },
+  ru: {
+    locale: 'ru-RU',
+    chars: 4,
+    typing: 42,
+    cjk: 'Noto Sans CJK SC',
+    grow: 'Добавь в это приложение боковую панель с историей диалогов',
+    reasoning: 'Пользователь хочет новую функцию в самом приложении, значит, это должно быть расширение. Сначала прочитаю руководство по расширениям.',
+    readDocs: 'Сначала прочитаю руководство по расширениям.',
+    write: 'Пишу боковую панель как расширение:',
+    grown: 'Боковая панель готова. Слева показаны прошлые диалоги: нажмите, чтобы переключиться, наведите курсор, чтобы удалить. Команда `/history` показывает и скрывает панель.',
+    task: 'Посмотри этот проект, замени приветствие на hello, seed и запусти',
+    look: 'Сначала посмотрю папку.',
+    run: 'Запустить входной файл',
+    answer: `Это совсем небольшой проект на **Node.js**:
+
+- \`README.md\`: описание
+- \`index.js\`: входной файл, одна строка вывода
+
+| Файл | Строк |
+| --- | ---: |
+| README.md | 1 |
+| index.js | 1 |
+
+Я заменил приветствие на \`hello, seed\`. Результат:
 
 \`\`\`bash
 $ node index.js
@@ -253,6 +349,9 @@ async function capture(lang, theme, { demo = true } = {}) {
   try {
     await page.goto(address.urlWithToken);
     await page.waitForSelector('#hint .status');
+    // The same fonts in every picture: Inter for Latin and Cyrillic text, Noto for Chinese and Japanese.
+    await page.addStyleTag({ content: `:root { --font: Inter, "${t.cjk}", sans-serif !important; }` });
+    await page.evaluate(() => document.fonts.ready);
 
     // The demo: one sentence, and the app grows a sidebar.
     const recorder = new Recorder(page, framesDir);
@@ -260,7 +359,7 @@ async function capture(lang, theme, { demo = true } = {}) {
       await page.waitForTimeout(400);
       recorder.start();
       await page.waitForTimeout(1300);
-      await page.locator('#input').pressSequentially(t.grow, { delay: lang === 'zh' ? 95 : 42 });
+      await page.locator('#input').pressSequentially(t.grow, { delay: t.typing });
       await page.waitForTimeout(550);
     } else {
       await page.fill('#input', t.grow);
@@ -382,7 +481,8 @@ async function badges() {
   await badge('badge-platform.svg', 'platform', 'macOS · Windows · Linux');
   await badge('badge-models.svg', 'models', 'DeepSeek · OpenAI · Claude · Ollama · …', '#2f6fbd');
   await badge('badge-api.svg', 'API', 'REST · OpenAI-compatible', '#8250df');
-  await button('download-macos.svg', 'macOS', '.dmg');
+  await button('download-macos-arm64.svg', 'macOS', 'Apple silicon');
+  await button('download-macos-x64.svg', 'macOS', 'Intel');
   await button('download-windows.svg', 'Windows', '.exe');
   await button('download-linux.svg', 'Linux', '.AppImage');
   await browser.close();
@@ -391,7 +491,7 @@ async function badges() {
 
 await fsp.mkdir(OUT, { recursive: true });
 if (!only || only === 'badges') await badges();
-for (const lang of ['zh', 'en']) {
+for (const lang of Object.keys(TEXT)) {
   for (const theme of ['light', 'dark']) {
     if (only && only !== `${lang}-${theme}`) continue;
     await capture(lang, theme, { demo: !process.argv.includes('--no-demo') });

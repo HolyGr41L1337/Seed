@@ -59,7 +59,7 @@ Complete, working examples are in `examples/extensions/` in the app folder:
 - `activate` may be `async`. A thrown error marks the extension as failed and everything it registered so far is removed.
 - Give elements you may want to find again an `id` or a class prefixed with the extension name.
 - Style with the CSS variables and `.seed-*` classes below, so the extension follows light and dark mode. Do not hard-code colors.
-- Text shown to the user should follow the interface language: `seed.tr('中文', 'English')`.
+- Text shown to the user should follow the interface language: `seed.tr('中文', 'English')`. The interface also comes in Japanese, French and Russian; pass those as a third argument when you have them, `seed.tr('中文', 'English', { ja: '日本語', fr: 'Français', ru: 'Русский' })`. A language without its own text gets the English one.
 - Do not edit the files of the app itself. If the extension API cannot do something, say so.
 - Extension code runs with the user's full authority: `client.js` can call the whole API, `server.js` can do anything Node.js can. Write only what the user asked for.
 
@@ -99,7 +99,7 @@ export function activate(seed) { /* ... */ return optionalCleanupFunction; }
 | --- | --- |
 | `seed.h(tag, props?, ...children)` | Creates an element. Props: `class`, `style` (string or object), `dataset`, `on<event>` handlers, attributes. Children: nodes, strings, arrays; `null` and `false` are skipped. |
 | `seed.icon(name, size?)` | Inline SVG icon. Names: `send, stop, plus, check, x, dot, chevron, caret, down, copy, trash, settings, sidebar, search, edit, alert, terminal, file, folder, eye, globe, sparkle, refresh, plug, wrench, list, chip, shield`. |
-| `seed.tr(chinese, english)` | Picks the text for the interface language. `seed.lang` is `"zh"` or `"en"`. |
+| `seed.tr(chinese, english, others?)` | Picks the text for the interface language. `others` is an optional object with more languages: `{ ja, fr, ru }`. `seed.lang` is `"zh"`, `"en"`, `"ja"`, `"fr"` or `"ru"`. |
 | `seed.ui.mount(slot, content, options?)` | Puts content into a slot. `content` is a DOM node, or a function `(container) => cleanup?`. Options: `width` (number of pixels or CSS length; for `left` and `right`), `id`. Returns a function that removes it. |
 | `seed.ui.addStyle(cssText)` | Adds a stylesheet (a `style.css` file in the folder is loaded automatically). |
 | `seed.ui.toast(text, { type: 'error', action: { label, run } }?)` | Short message at the top of the page. |
